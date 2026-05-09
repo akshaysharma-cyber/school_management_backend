@@ -1,5 +1,8 @@
 package com.school.management.School.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +19,14 @@ public class TeacherController {
 	@Autowired
     private TeacherService teacherService;
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addTeacher(@RequestBody CreateTeacherRequest request) {
-        return ResponseEntity.ok(teacherService.createTeacher(request));
-    }
+	@PostMapping("/add")
+	public ResponseEntity<?> addTeacher(@RequestBody CreateTeacherRequest request) {
+
+	    String message = teacherService.createTeacher(request);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", message);
+
+	    return ResponseEntity.ok(response);
+	}
 }

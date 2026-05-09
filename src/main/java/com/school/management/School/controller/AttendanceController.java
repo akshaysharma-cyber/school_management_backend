@@ -1,6 +1,8 @@
 package com.school.management.School.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,10 @@ public class AttendanceController {
             @RequestParam Long schoolId,
             @RequestParam String className,
             @RequestParam String section) {
+		
+		System.out.println("schoolId = " + schoolId);
+	    System.out.println("className = " + className);
+	    System.out.println("section = " + section);
 
         return repository.findBySchoolIdAndClassNameAndSection(
                 schoolId, className, section
@@ -39,7 +45,13 @@ public class AttendanceController {
 
 	@PostMapping("/mark")
 	public ResponseEntity<?> markAttendance(@RequestBody AttendanceRequest request) {
-		return ResponseEntity.ok(attendanceService.markAttendance(request));
+
+	    attendanceService.markAttendance(request);
+
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "Attendance marked successfully");
+
+	    return ResponseEntity.ok(response);
 	}
 	
 	
