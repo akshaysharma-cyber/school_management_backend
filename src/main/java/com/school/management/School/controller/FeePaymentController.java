@@ -1,0 +1,38 @@
+package com.school.management.School.controller;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.school.management.School.dto.CollectFeeRequest;
+import com.school.management.School.entity.StudentFees;
+import com.school.management.School.repository.StudentFeesRepository;
+import com.school.management.School.service.FeePaymentService;
+
+@RestController
+@RequestMapping("/api/fees")
+public class FeePaymentController {
+	@Autowired
+    private FeePaymentService feePaymentService;
+	
+	private StudentFeesRepository feesRepository;
+
+    @PostMapping("/collect")
+    public ResponseEntity<?> collectFee(@RequestBody CollectFeeRequest request) {
+        return ResponseEntity.ok(feePaymentService.collectFee(request));
+    }
+    
+    @GetMapping("/student/{id}")
+    public Optional<StudentFees> getStudentFee(@PathVariable Long id) throws RuntimeException {
+        
+		return feesRepository.findById(id);
+    }
+
+}
