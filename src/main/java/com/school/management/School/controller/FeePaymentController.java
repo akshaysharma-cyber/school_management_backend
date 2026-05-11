@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.school.management.School.dto.CollectFeeRequest;
+import com.school.management.School.entity.FeeDetailsResponse;
 import com.school.management.School.entity.StudentFees;
 import com.school.management.School.repository.StudentFeesRepository;
 import com.school.management.School.service.FeePaymentService;
@@ -21,8 +22,10 @@ import com.school.management.School.service.FeePaymentService;
 public class FeePaymentController {
 	@Autowired
     private FeePaymentService feePaymentService;
-	
+	@Autowired
 	private StudentFeesRepository feesRepository;
+	
+	
 
     @PostMapping("/collect")
     public ResponseEntity<?> collectFee(@RequestBody CollectFeeRequest request) {
@@ -33,6 +36,18 @@ public class FeePaymentController {
     public Optional<StudentFees> getStudentFee(@PathVariable Long id) throws RuntimeException {
         
 		return feesRepository.findById(id);
+    }
+    
+    @GetMapping("/student/{schoolId}/{studentId}")
+    public FeeDetailsResponse getFeeDetails(
+            @PathVariable Long schoolId,
+            @PathVariable Long studentId
+    ) {
+
+        return feePaymentService.getFeeDetails(
+                schoolId,
+                studentId
+        );
     }
 
 }

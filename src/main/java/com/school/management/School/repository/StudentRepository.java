@@ -23,5 +23,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 			    String className,
 			    String section
 			);
+	 
+	 List<Student> findBySchoolIdAndClassName(
+	            Long schoolId,
+	            String className
+	    );
 
 }

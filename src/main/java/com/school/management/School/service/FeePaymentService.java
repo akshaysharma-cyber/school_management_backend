@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.school.management.School.dto.CollectFeeRequest;
+import com.school.management.School.entity.FeeDetailsResponse;
 import com.school.management.School.entity.FeePayment;
 import com.school.management.School.entity.StudentFees;
 import com.school.management.School.repository.FeePaymentRepository;
@@ -57,6 +58,11 @@ public class FeePaymentService {
 		payment.setAcademicYear(sf.getAcademicYear());
 
 		payment.setAmountPaid(request.getAmount());
+		if (request.getPaymentDate() == null ||
+			    request.getPaymentDate().isEmpty()) {
+
+			    throw new RuntimeException("Payment date is required");
+			}
 		payment.setPaymentDate(LocalDate.parse(request.getPaymentDate()));
 		payment.setPaymentMode(request.getPaymentMode());
 		payment.setRemarks(request.getRemarks());
@@ -65,5 +71,24 @@ public class FeePaymentService {
 
 		return "Payment submitted successfully";
 	}
+	
+	
+	  public FeeDetailsResponse getFeeDetails(
+	            Long schoolId,
+	            Long studentId
+	    ) {
+
+	        StudentFees fee = studentFeesRepository
+	                .findBySchoolIdAndStudentId(schoolId, studentId)
+	                .orElseThrow(() ->
+	                        new RuntimeException("Fee details not found"));
+
+	        return new FeeDetailsResponse(
+	        		fee.getId(),
+	                fee.getTotalAmount(),
+	                fee.getPaidAmount(),
+	                fee.getDueAmount()
+	        );
+	    }
 
 }

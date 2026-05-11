@@ -1,6 +1,7 @@
 package com.school.management.School.service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,5 +49,15 @@ public class StudentService {
         studentRepository.save(student);
 
         return "Student added successfully";
+    }
+    
+    public List<Student> getStudentsByClass(
+            Long schoolId,
+            String className
+    ) {
+        return studentRepository.findBySchoolIdAndClassName(
+                schoolId,
+                className
+        );
     }
 }

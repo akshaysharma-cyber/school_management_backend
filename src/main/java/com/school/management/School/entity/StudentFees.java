@@ -31,7 +31,7 @@ public class StudentFees {
     private String academicYear;
 
     private Double totalAmount;
-    private Double paidAmount = 0.0;
+    private Double paidAmount ;
     private Double dueAmount;
 
     @Enumerated(EnumType.STRING)

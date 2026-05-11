@@ -26,4 +26,9 @@ public interface StudentFeesRepository extends JpaRepository<StudentFees, Long> 
             StudentFees.Status status,
             String academicYear
     );
+    
+    Optional<StudentFees> findBySchoolIdAndStudentId(
+            Long schoolId,
+            Long studentId
+    );
 }
