@@ -18,6 +18,16 @@ public class ClassSubject {
     private Long schoolId;
 
     private String className;
+    
+    private Double maxMarks;
+
+	public Double getMaxMarks() {
+		return maxMarks;
+	}
+
+	public void setMaxMarks(Double maxMarks) {
+		this.maxMarks = maxMarks;
+	}
 
     @ManyToOne
     @JoinColumn(name = "subject_id")

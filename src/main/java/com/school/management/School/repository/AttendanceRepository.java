@@ -9,5 +9,11 @@ import com.school.management.School.entity.Attendance;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	Optional<Attendance> findByStudentIdAndAttendanceDate(Long studentId, LocalDate date);
+	
+	long countBySchoolIdAndAttendanceDateAndStatus(
+	        Long schoolId,
+	        LocalDate attendanceDate,
+	        Attendance.Status status
+	);
 
 }

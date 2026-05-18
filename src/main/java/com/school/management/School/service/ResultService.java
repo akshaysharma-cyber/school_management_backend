@@ -32,9 +32,9 @@ public class ResultService {
 	@Autowired
 	private ExamSubjectRepository examSubjectRepository;
 
-	public ResultResponse getResult(Long schoolId, Long examId, String className, String section) {
+	public ResultResponse getResult(Long schoolId, Long examId, String className) {
 
-		List<Student> students = studentRepository.findBySchoolIdAndClassNameAndSection(schoolId, className, section);
+		List<Student> students = studentRepository.findBySchoolIdAndClassName(schoolId, className);
 
 		List<ExamSubject> examSubjects = examSubjectRepository.findByExamId(examId);
 

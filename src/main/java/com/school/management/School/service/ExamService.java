@@ -10,10 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.school.management.School.dto.CreateExamRequest;
 import com.school.management.School.dto.SubjectDto;
+import com.school.management.School.dto.SubjectMarksDto;
+import com.school.management.School.entity.ClassSubject;
 import com.school.management.School.entity.Exam;
 import com.school.management.School.entity.ExamSubject;
+import com.school.management.School.entity.Subject;
 import com.school.management.School.repository.ClassSubjectRepository;
 import com.school.management.School.repository.ExamRepository;
+import com.school.management.School.repository.SubjectRepository;
 
 @Service
 @Transactional
@@ -24,6 +28,8 @@ public class ExamService {
 
 	@Autowired
 	private ClassSubjectRepository classSubjectRepository;
+	@Autowired
+	private SubjectRepository subjectRepository;
 
 	public String createExam(CreateExamRequest request) {
 
@@ -90,5 +96,53 @@ public class ExamService {
 
 		return "Exam created successfully";
 	}
+	
+	
+	 public List<Exam> getAllExamsBySchool(Long schoolId) {
+
+	        return examRepository.findBySchoolId(schoolId);
+	    }
+	 
+	 
+	 public List<SubjectMarksDto> getExamSubjects(
+	            Long examId,
+	            Long schoolId,
+	            String className
+	    ) {
+
+	        Exam exam = examRepository
+	                .findById(examId)
+	                .orElseThrow(() ->
+	                        new RuntimeException("Exam not found"));
+
+	        List<SubjectMarksDto> result = new ArrayList<>();
+
+	        for (ExamSubject es : exam.getSubjects()) {
+
+	            Subject subject = subjectRepository
+	                    .findById(es.getSubjectId())
+	                    .orElse(null);
+
+	            if (subject != null) {
+
+	                SubjectMarksDto dto =
+	                        new SubjectMarksDto();
+
+	                dto.setSubjectId(subject.getId());
+
+	                dto.setName(
+	                        subject.getSubjectName()
+	                );
+
+	                dto.setMarks(
+	                        es.getMaxMarks()
+	                );
+
+	                result.add(dto);
+	            }
+	        }
+
+	        return result;
+	    }
 
 }

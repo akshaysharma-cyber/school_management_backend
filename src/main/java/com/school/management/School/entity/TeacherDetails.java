@@ -122,7 +122,26 @@ public class TeacherDetails {
 
     private String gender;
     private String address;
+    private String FullName;
+   
+    private String mobileNumber ;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    public String getFullName() {
+		return FullName;
+	}
+
+	public void setFullName(String fullName) {
+		FullName = fullName;
+	}
+
+	public String getMobileNumber() {
+		return mobileNumber;
+	}
+
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
+	}
+
+	private LocalDateTime createdAt = LocalDateTime.now();
 
 }

@@ -17,16 +17,20 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 	
 	 List<Student> findByClassNameAndSection(String className, String section);
 	 
-	 boolean existsByIdAndSchoolIdAndClassNameAndSection(
+	 boolean existsByIdAndSchoolIdAndClassName(
 			    Long id,
 			    Long schoolId,
-			    String className,
-			    String section
+			    String className
+			   
 			);
 	 
 	 List<Student> findBySchoolIdAndClassName(
 	            Long schoolId,
 	            String className
 	    );
+	 
+	 long countBySchoolId(Long schoolId);
+	 
+	 List<Student> findBySchoolId(Long schoolId);
 
 }

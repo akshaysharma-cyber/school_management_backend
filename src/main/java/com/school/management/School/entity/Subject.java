@@ -40,4 +40,6 @@ public class Subject {
 	    private Long schoolId;
 
 	    private String subjectName;
+	    
+	    
 }

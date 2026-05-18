@@ -201,5 +201,14 @@ public class Student {
     private String birthCertificateUrl;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    private Boolean active = true;
+
+	public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 
 }

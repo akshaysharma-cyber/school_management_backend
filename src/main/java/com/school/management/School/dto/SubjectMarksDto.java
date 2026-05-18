@@ -2,7 +2,14 @@ package com.school.management.School.dto;
 
 public class SubjectMarksDto {
 	private Long subjectId;
-    private Double marks;
+	private String name;
+    public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	private Double marks;
 	public Long getSubjectId() {
 		return subjectId;
 	}

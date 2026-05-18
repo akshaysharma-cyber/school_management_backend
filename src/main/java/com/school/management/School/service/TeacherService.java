@@ -1,6 +1,8 @@
 package com.school.management.School.service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -107,6 +109,51 @@ public class TeacherService {
         teacherRepository.save(teacher);
 
         return "Teacher added successfully";
+    }
+    
+    
+    // GET ALL TEACHERS
+    public List<TeacherDetails> getAllTeachers(Long schoolId) {
+        return teacherRepository.findBySchoolId(schoolId);
+    }
+
+    // GET SINGLE TEACHER
+    public TeacherDetails getTeacherById(Long id) {
+        return teacherRepository.findById(id).orElse(null);
+    }
+
+    // UPDATE TEACHER
+    public TeacherDetails updateTeacher(Long id, TeacherDetails updatedTeacher) {
+
+        Optional<TeacherDetails> optionalTeacher = teacherRepository.findById(id);
+
+        if(optionalTeacher.isPresent()) {
+
+            TeacherDetails teacher = optionalTeacher.get();
+
+            teacher.setFullName(updatedTeacher.getFullName());
+            teacher.setMobileNumber(updatedTeacher.getMobileNumber());
+            teacher.setDateOfBirth(updatedTeacher.getDateOfBirth());
+            teacher.setGender(updatedTeacher.getGender());
+            teacher.setAddress(updatedTeacher.getAddress());
+
+            teacher.setEmployeeId(updatedTeacher.getEmployeeId());
+            teacher.setQualification(updatedTeacher.getQualification());
+            teacher.setSubject(updatedTeacher.getSubject());
+            teacher.setJoiningDate(updatedTeacher.getJoiningDate());
+
+            return teacherRepository.save(teacher);
+        }
+
+        return null;
+    }
+
+    // DELETE TEACHER
+    public String deleteTeacher(Long id) {
+
+        teacherRepository.deleteById(id);
+
+        return "Teacher Deleted Successfully";
     }
 
 }
