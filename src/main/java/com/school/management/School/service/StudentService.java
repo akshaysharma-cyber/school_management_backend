@@ -1,11 +1,17 @@
 package com.school.management.School.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.school.management.School.dto.StudentRequest;
 import com.school.management.School.entity.Student;
@@ -16,145 +22,187 @@ import com.school.management.School.repository.StudentRepository;
 public class StudentService {
 
 	@Autowired
-    private StudentRepository studentRepository;
+	private StudentRepository studentRepository;
 
-    public String addStudent(StudentRequest request) {
+	public String addStudent(
 
-        if (studentRepository.findByAdmissionNumber(request.getAdmissionNumber()).isPresent()) {
-            throw new RuntimeException("Admission number already exists");
-        }
+			StudentRequest request,
 
-        Student student = new Student();
-        student.setSchoolId(request.getSchoolId());
-        student.setAdmissionNumber(request.getAdmissionNumber());
-        student.setFullName(request.getFullName());
+			MultipartFile photo,
 
-        if (request.getDateOfBirth() != null) {
-            student.setDateOfBirth(LocalDate.parse(request.getDateOfBirth()));
-        }
+			MultipartFile birthCertificate
 
-        student.setGender(request.getGender());
-        student.setBloodGroup(request.getBloodGroup());
-        student.setCategory(request.getCategory());
-        student.setReligion(request.getReligion());
-        student.setNationality(request.getNationality());
+	) throws IOException {
 
-        student.setParentName(request.getParentName());
-        student.setRelationship(request.getRelationship());
-        student.setParentMobile(request.getParentMobile());
-        student.setParentEmail(request.getParentEmail());
-        student.setAddress(request.getAddress());
+		if (studentRepository.findByAdmissionNumber(request.getAdmissionNumber()).isPresent()) {
 
-        student.setClassName(request.getClassName());
-        student.setSection(request.getSection());
-        student.setActive(true);
-       
+			throw new RuntimeException("Admission number already exists");
+		}
 
-        studentRepository.save(student);
+		Student student = new Student();
 
-        return "Student added successfully";
-    }
-    
-    public List<Student> getStudentsByClass(
-            Long schoolId,
-            String className
-    ) {
-        return studentRepository.findBySchoolIdAndClassName(
-                schoolId,
-                className
-        );
-    }
-    
-    public List<StudentResponse> getStudentsByClassForMarks(
-            Long schoolId,
-            String className
-    ) {
+		student.setSchoolId(request.getSchoolId());
 
-        List<Student> students =
-                studentRepository.findBySchoolIdAndClassName(
-                        schoolId,
-                        className
-                );
+		student.setAdmissionNumber(request.getAdmissionNumber());
 
-        return students.stream().map(student -> {
+		student.setFullName(request.getFullName());
 
-            StudentResponse response =
-                    new StudentResponse();
+		if (request.getDateOfBirth() != null) {
 
-            response.setId(student.getId());
-            response.setStudentName(student.getFullName());
-            response.setAdmissionNo(student.getAdmissionNumber());
-            
+			student.setDateOfBirth(LocalDate.parse(request.getDateOfBirth()));
+		}
 
-            return response;
+		student.setGender(request.getGender());
 
-        }).toList();
-    }
-    
-    
- // =========================
-    // GET ALL STUDENTS
-    // =========================
-    public List<Student> getAllStudents(Long schoolId) {
-        return studentRepository.findBySchoolId(schoolId);
-    }
+		student.setBloodGroup(request.getBloodGroup());
 
-    // =========================
-    // GET STUDENT BY ID
-    // =========================
-    public Student getStudentById(Long id) {
-        return studentRepository.findById(id).orElse(null);
-    }
+		student.setCategory(request.getCategory());
 
-    // =========================
-    // UPDATE STUDENT
-    // =========================
-    public Student updateStudent(Long id, Student updatedStudent) {
+		student.setReligion(request.getReligion());
 
-        Optional<Student> optionalStudent = studentRepository.findById(id);
+		student.setNationality(request.getNationality());
 
-        if (optionalStudent.isPresent()) {
+		student.setParentName(request.getParentName());
 
-            Student student = optionalStudent.get();
+		student.setRelationship(request.getRelationship());
 
-            //student.setAdmissionNumber(updatedStudent.getAdmissionNumber());
-            student.setFullName(updatedStudent.getFullName());
-            student.setDateOfBirth(updatedStudent.getDateOfBirth());
-            student.setGender(updatedStudent.getGender());
-            student.setBloodGroup(updatedStudent.getBloodGroup());
+		student.setParentMobile(request.getParentMobile());
 
-            student.setCategory(updatedStudent.getCategory());
-            student.setReligion(updatedStudent.getReligion());
-            student.setNationality(updatedStudent.getNationality());
+		student.setParentEmail(request.getParentEmail());
 
-            student.setParentName(updatedStudent.getParentName());
-            student.setRelationship(updatedStudent.getRelationship());
-            student.setParentMobile(updatedStudent.getParentMobile());
-            student.setParentEmail(updatedStudent.getParentEmail());
+		student.setAddress(request.getAddress());
 
-            student.setAddress(updatedStudent.getAddress());
+		student.setClassName(request.getClassName());
 
-            student.setClassName(updatedStudent.getClassName());
-            student.setSection(updatedStudent.getSection());
-            student.setActive(false);
-            return studentRepository.save(student);
-        }
+		student.setSection(request.getSection());
 
-        return null;
-    }
+		student.setActive(true);
 
-    // =========================
-    // DELETE STUDENT
-    // =========================
-    public String deleteStudent(Long id) {
+		// =========================
+		// FILE UPLOAD LOGIC
+		// =========================
 
-        if (studentRepository.existsById(id)) {
+		String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
-            studentRepository.deleteById(id);
+		// PHOTO UPLOAD
 
-            return "Student Deleted Successfully";
-        }
+		if (photo != null && !photo.isEmpty()) {
 
-        return "Student Not Found";
-    }
+			String photoName = UUID.randomUUID() + "_" + photo.getOriginalFilename();
+
+			Path photoPath = Paths.get(uploadDir + "students/photos/" + photoName);
+
+			Files.createDirectories(photoPath.getParent());
+
+			Files.write(photoPath, photo.getBytes());
+
+			student.setPhotoUrl("/uploads/students/photos/" + photoName);
+		}
+
+		// BIRTH CERTIFICATE UPLOAD
+
+		if (birthCertificate != null && !birthCertificate.isEmpty()) {
+
+			String docName = UUID.randomUUID() + "_" + birthCertificate.getOriginalFilename();
+
+			Path docPath = Paths.get(uploadDir + "students/documents/" + docName);
+
+			Files.createDirectories(docPath.getParent());
+
+			Files.write(docPath, birthCertificate.getBytes());
+
+			student.setBirthCertificateUrl("/uploads/students/documents/" + docName);
+		}
+
+		studentRepository.save(student);
+
+		return "Student added successfully";
+	}
+
+	public List<Student> getStudentsByClass(Long schoolId, String className) {
+		return studentRepository.findBySchoolIdAndClassName(schoolId, className);
+	}
+
+	public List<StudentResponse> getStudentsByClassForMarks(Long schoolId, String className) {
+
+		List<Student> students = studentRepository.findBySchoolIdAndClassName(schoolId, className);
+
+		return students.stream().map(student -> {
+
+			StudentResponse response = new StudentResponse();
+
+			response.setId(student.getId());
+			response.setStudentName(student.getFullName());
+			response.setAdmissionNo(student.getAdmissionNumber());
+
+			return response;
+
+		}).toList();
+	}
+
+	// =========================
+	// GET ALL STUDENTS
+	// =========================
+	public List<Student> getAllStudents(Long schoolId) {
+		return studentRepository.findBySchoolId(schoolId);
+	}
+
+	// =========================
+	// GET STUDENT BY ID
+	// =========================
+	public Student getStudentById(Long id) {
+		return studentRepository.findById(id).orElse(null);
+	}
+
+	// =========================
+	// UPDATE STUDENT
+	// =========================
+	public Student updateStudent(Long id, Student updatedStudent) {
+
+		Optional<Student> optionalStudent = studentRepository.findById(id);
+
+		if (optionalStudent.isPresent()) {
+
+			Student student = optionalStudent.get();
+
+			// student.setAdmissionNumber(updatedStudent.getAdmissionNumber());
+			student.setFullName(updatedStudent.getFullName());
+			student.setDateOfBirth(updatedStudent.getDateOfBirth());
+			student.setGender(updatedStudent.getGender());
+			student.setBloodGroup(updatedStudent.getBloodGroup());
+
+			student.setCategory(updatedStudent.getCategory());
+			student.setReligion(updatedStudent.getReligion());
+			student.setNationality(updatedStudent.getNationality());
+
+			student.setParentName(updatedStudent.getParentName());
+			student.setRelationship(updatedStudent.getRelationship());
+			student.setParentMobile(updatedStudent.getParentMobile());
+			student.setParentEmail(updatedStudent.getParentEmail());
+
+			student.setAddress(updatedStudent.getAddress());
+
+			student.setClassName(updatedStudent.getClassName());
+			student.setSection(updatedStudent.getSection());
+			student.setActive(false);
+			return studentRepository.save(student);
+		}
+
+		return null;
+	}
+
+	// =========================
+	// DELETE STUDENT
+	// =========================
+	public String deleteStudent(Long id) {
+
+		if (studentRepository.existsById(id)) {
+
+			studentRepository.deleteById(id);
+
+			return "Student Deleted Successfully";
+		}
+
+		return "Student Not Found";
+	}
 }
