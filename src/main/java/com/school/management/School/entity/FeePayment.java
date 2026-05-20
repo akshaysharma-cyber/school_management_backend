@@ -3,6 +3,7 @@ package com.school.management.School.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -100,5 +101,15 @@ public class FeePayment {
     private String remarks;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "receipt_number")
+    private String receiptNumber;
+
+	public String getReceiptNumber() {
+		return receiptNumber;
+	}
+
+	public void setReceiptNumber(String receiptNumber) {
+		this.receiptNumber = receiptNumber;
+	}
 
 }

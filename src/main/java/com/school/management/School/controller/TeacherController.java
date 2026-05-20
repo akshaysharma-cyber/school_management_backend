@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.school.management.School.dto.CreateTeacherRequest;
+import com.school.management.School.dto.TeacherResponse;
 import com.school.management.School.entity.TeacherDetails;
 import com.school.management.School.service.TeacherService;
 
@@ -38,12 +39,14 @@ public class TeacherController {
 	}
 	
 	// GET ALL TEACHERS
-    @GetMapping("/all")
-    public List<TeacherDetails> getAllTeachers(
-            @RequestParam Long schoolId
-    ) {
-        return teacherService.getAllTeachers(schoolId);
-    }
+	@GetMapping("/all")
+	public List<TeacherResponse> getAllTeachers(
+	        @RequestParam Long schoolId
+	) {
+	    return teacherService.getAllTeachers(
+	            schoolId
+	    );
+	}
 
     // GET TEACHER BY ID
     @GetMapping("/{id}")

@@ -24,36 +24,48 @@ public class AttendanceController {
 
 	@Autowired
 	private AttendanceService attendanceService;
-	
+
 	@Autowired
 	private StudentRepository repository;
-	
-	@GetMapping("/students")
-    public List<Student> getStudents(
-            @RequestParam Long schoolId,
-            @RequestParam String className,
-            @RequestParam String section) {
-		
-		System.out.println("schoolId = " + schoolId);
-	    System.out.println("className = " + className);
-	    System.out.println("section = " + section);
 
-        return repository.findBySchoolIdAndClassNameAndSection(
-                schoolId, className, section
-        );
-    }
+	@GetMapping("/students")
+	public List<Student> getStudents(@RequestParam Long schoolId, @RequestParam String className,
+			@RequestParam String section) {
+
+		System.out.println("schoolId = " + schoolId);
+		System.out.println("className = " + className);
+		System.out.println("section = " + section);
+
+		return repository.findBySchoolIdAndClassNameAndSection(schoolId, className, section);
+	}
 
 	@PostMapping("/mark")
 	public ResponseEntity<?> markAttendance(@RequestBody AttendanceRequest request) {
 
-	    attendanceService.markAttendance(request);
+		attendanceService.markAttendance(request);
 
-	    Map<String, String> response = new HashMap<>();
-	    response.put("message", "Attendance marked successfully");
+		Map<String, String> response = new HashMap<>();
+		response.put("message", "Attendance marked successfully");
 
-	    return ResponseEntity.ok(response);
+		return ResponseEntity.ok(response);
 	}
-	
-	
+
+	@GetMapping("/by-date")
+	public ResponseEntity<?> getAttendanceByDate(
+
+			@RequestParam Long schoolId,
+
+			@RequestParam String className,
+
+			@RequestParam String section,
+
+			@RequestParam String date
+
+	) {
+
+		return ResponseEntity.ok(
+
+				attendanceService.getAttendanceByDate(schoolId, className, section, date));
+	}
 
 }

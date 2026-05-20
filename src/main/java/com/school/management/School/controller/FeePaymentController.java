@@ -1,5 +1,6 @@
 package com.school.management.School.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.school.management.School.dto.ClassCollectionResponse;
 import com.school.management.School.dto.CollectFeeRequest;
+import com.school.management.School.dto.FeeDashboardResponse;
+import com.school.management.School.dto.RecentPaymentResponse;
 import com.school.management.School.entity.FeeDetailsResponse;
 import com.school.management.School.entity.StudentFees;
 import com.school.management.School.repository.StudentFeesRepository;
@@ -27,10 +31,13 @@ public class FeePaymentController {
 	
 	
 
-    @PostMapping("/collect")
-    public ResponseEntity<?> collectFee(@RequestBody CollectFeeRequest request) {
-        return ResponseEntity.ok(feePaymentService.collectFee(request));
-    }
+	@PostMapping("/collect")
+	public ResponseEntity<?> collectFee(
+	        @RequestBody CollectFeeRequest request) {
+
+	    return ResponseEntity.ok(
+	            feePaymentService.collectFee(request));
+	}
     
     @GetMapping("/student/{id}")
     public Optional<StudentFees> getStudentFee(@PathVariable Long id) throws RuntimeException {
@@ -48,6 +55,35 @@ public class FeePaymentController {
                 schoolId,
                 studentId
         );
+    }
+    
+    @GetMapping("/dashboard/{schoolId}")
+    public FeeDashboardResponse getDashboardData(
+            @PathVariable Long schoolId
+    ) {
+
+        return feePaymentService
+                .getDashboardData(schoolId);
+    }
+    
+    @GetMapping("/recent-payments/{schoolId}")
+    public List<RecentPaymentResponse>
+    getRecentPayments(
+            @PathVariable Long schoolId
+    ) {
+
+        return feePaymentService
+                .getRecentPayments(schoolId);
+    }
+    
+    @GetMapping("/class-collection/{schoolId}")
+    public List<ClassCollectionResponse>
+    getClassCollection(
+            @PathVariable Long schoolId
+    ) {
+
+        return feePaymentService
+                .getClassCollection(schoolId);
     }
 
 }

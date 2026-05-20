@@ -13,8 +13,17 @@ public class FeeDetailsResponse {
 	private Double totalAmount;
 	    private Double paidAmount;
 	    private Double dueAmount;
+	   private String receiptNumber;
 
-	    public FeeDetailsResponse() {
+	    public String getReceiptNumber() {
+		return receiptNumber;
+	}
+
+	public void setReceiptNumber(String receiptNumber) {
+		this.receiptNumber = receiptNumber;
+	}
+
+		public FeeDetailsResponse() {
 	    }
 
 	    public Double getTotalAmount() {
@@ -41,11 +50,12 @@ public class FeeDetailsResponse {
 			this.dueAmount = dueAmount;
 		}
 
-		public FeeDetailsResponse(Long id,Double totalAmount, Double paidAmount, Double dueAmount) {
+		public FeeDetailsResponse(Long id,Double totalAmount, Double paidAmount, Double dueAmount,String receiptNumber) {
 	        this.id=id;
 			this.totalAmount = totalAmount;
 	        this.paidAmount = paidAmount;
 	        this.dueAmount = dueAmount;
+	        this.receiptNumber=receiptNumber;
 	    }
 
 }

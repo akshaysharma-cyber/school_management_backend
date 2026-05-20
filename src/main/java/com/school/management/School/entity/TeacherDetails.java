@@ -3,6 +3,7 @@ package com.school.management.School.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +20,10 @@ public class TeacherDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+	@OneToOne(
+		    cascade = CascadeType.ALL,
+		    orphanRemoval = true
+		) 
     @JoinColumn(name = "user_id")
     private User user;
 

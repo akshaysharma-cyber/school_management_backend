@@ -1,6 +1,7 @@
 package com.school.management.School.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,66 +17,88 @@ import com.school.management.School.repository.StudentRepository;
 
 @Service
 public class AttendanceService {
-	
-	 @Autowired
-	    private AttendanceRepository attendanceRepository;
 
-	    @Autowired
-	    private StudentRepository studentRepository;
+	@Autowired
+	private AttendanceRepository attendanceRepository;
 
-	    public String markAttendance(AttendanceRequest request) {
+	@Autowired
+	private StudentRepository studentRepository;
 
-	        LocalDate date = LocalDate.parse(request.getDate());
+	public String markAttendance(AttendanceRequest request) {
 
-	        // 🔹 Step 1: Get all students of class
-	        List<Student> students = studentRepository
-	                .findBySchoolIdAndClassNameAndSection(
-	                        request.getSchoolId(),
-	                        request.getClassName(),
-	                        request.getSection()
-	                );
+		LocalDate date = LocalDate.parse(request.getDate());
 
-	        // 🔹 Step 2: Convert marked list to map
-	        Map<Long, String> markedMap = new HashMap<>();
+		// 🔹 Step 1: Get all students of class
+		List<Student> students = studentRepository.findBySchoolIdAndClassNameAndSection(request.getSchoolId(),
+				request.getClassName(), request.getSection());
 
-	        if (request.getMarkedStudents() != null) {
-	            for (AttendanceRequest.StudentAttendance s : request.getMarkedStudents()) {
-	                markedMap.put(s.getStudentId(), s.getStatus());
-	            }
-	        }
+		// 🔹 Step 2: Convert marked list to map
+		Map<Long, String> markedMap = new HashMap<>();
 
-	        // 🔹 Step 3: Loop all students
-	        for (Student student : students) {
+		if (request.getMarkedStudents() != null) {
+			for (AttendanceRequest.StudentAttendance s : request.getMarkedStudents()) {
+				markedMap.put(s.getStudentId(), s.getStatus());
+			}
+		}
 
-	            Attendance.Status status;
+		// 🔹 Step 3: Loop all students
+		for (Student student : students) {
 
-	            if (markedMap.containsKey(student.getId())) {
-	                status = Attendance.Status.valueOf(markedMap.get(student.getId()));
-	            } else {
-	                status = Attendance.Status.PRESENT; // ✅ default
-	            }
+			Attendance.Status status;
 
-	            // 🔹 Step 4: Insert or Update
-	            Attendance existing = attendanceRepository
-	                    .findByStudentIdAndAttendanceDate(student.getId(), date)
-	                    .orElse(null);
+			if (markedMap.containsKey(student.getId())) {
+				status = Attendance.Status.valueOf(markedMap.get(student.getId()));
+			} else {
+				status = Attendance.Status.PRESENT; // ✅ default
+			}
 
-	            if (existing != null) {
-	                existing.setStatus(status);
-	                attendanceRepository.save(existing);
-	            } else {
-	                Attendance attendance = new Attendance();
-	                attendance.setSchoolId(request.getSchoolId());
-	                attendance.setStudentId(student.getId());
-	                attendance.setClassName(request.getClassName());
-	                attendance.setSection(request.getSection());
-	                attendance.setAttendanceDate(date);
-	                attendance.setStatus(status);
+			// 🔹 Step 4: Insert or Update
+			Attendance existing = attendanceRepository.findByStudentIdAndAttendanceDate(student.getId(), date)
+					.orElse(null);
 
-	                attendanceRepository.save(attendance);
-	            }
-	        }
+			if (existing != null) {
+				existing.setStatus(status);
+				attendanceRepository.save(existing);
+			} else {
+				Attendance attendance = new Attendance();
+				attendance.setSchoolId(request.getSchoolId());
+				attendance.setStudentId(student.getId());
+				attendance.setClassName(request.getClassName());
+				attendance.setSection(request.getSection());
+				attendance.setAttendanceDate(date);
+				attendance.setStatus(status);
 
-	        return "Attendance saved successfully";
-	    }
+				attendanceRepository.save(attendance);
+			}
+		}
+
+		return "Attendance saved successfully";
+	}
+
+	public List<Map<String, Object>> getAttendanceByDate(
+
+			Long schoolId, String className, String section, String date
+
+	) {
+
+		LocalDate attendanceDate = LocalDate.parse(date);
+
+		List<Attendance> attendanceList = attendanceRepository.findBySchoolIdAndClassNameAndSectionAndAttendanceDate(schoolId,
+				className, section, attendanceDate);
+
+		List<Map<String, Object>> response = new ArrayList<>();
+
+		for (Attendance a : attendanceList) {
+
+			Map<String, Object> map = new HashMap<>();
+
+			map.put("studentId", a.getStudentId());
+
+			map.put("status", a.getStatus());
+
+			response.add(map);
+		}
+
+		return response;
+	}
 }
