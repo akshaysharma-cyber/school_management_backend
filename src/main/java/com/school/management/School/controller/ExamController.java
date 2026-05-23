@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.school.management.School.dto.CreateExamRequest;
+import com.school.management.School.service.ExamDashboardService;
 import com.school.management.School.service.ExamService;
 
 @RestController
@@ -18,6 +19,8 @@ import com.school.management.School.service.ExamService;
 public class ExamController {
 	@Autowired
     private ExamService examService;
+	@Autowired
+	private ExamDashboardService dashboardService;
 
     @PostMapping("/create")
     public ResponseEntity<?> createExam(@RequestBody CreateExamRequest request) {
@@ -45,5 +48,22 @@ public class ExamController {
                 examService.getExamSubjects(examId,schoolId, className)
         );
     }
+    
+    
+    @GetMapping("/dashboard-stat")
+    public ResponseEntity<?> getDashboard(
+            @RequestParam Long schoolId
+    ) {
 
+        return ResponseEntity.ok(
+                dashboardService.getDashboard(schoolId)
+        );
+    }
+    
+	@GetMapping("/recent-results")
+	public ResponseEntity<?> recentResults(@RequestParam Long schoolId) {
+
+		return ResponseEntity.ok(dashboardService.getRecentResults(schoolId));
+
+	}
 }
