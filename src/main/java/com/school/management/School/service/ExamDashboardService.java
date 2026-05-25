@@ -15,103 +15,66 @@ import com.school.management.School.repository.StudentResultRepository;
 
 @Service
 public class ExamDashboardService {
-	
+
 	@Autowired
-    private ExamRepository examRepository;
+	private ExamRepository examRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
+	@Autowired
+	private StudentRepository studentRepository;
 
-    @Autowired
-    private StudentResultRepository resultRepository;
+	@Autowired
+	private StudentResultRepository resultRepository;
 
-	
 	public ExamDashboardDTO getDashboard(Long schoolId) {
 
-        LocalDate today = LocalDate.now();
+		LocalDate today = LocalDate.now();
 
-        // Upcoming
-        long upcoming =
-                examRepository.countUpcoming(
-                        schoolId,
-                        today
-                );
+		// Upcoming
+		long upcoming = examRepository.countUpcoming(schoolId, today);
 
-        // Ongoing
-        long ongoing =
-                examRepository.countOngoing(
-                        schoolId,
-                        today
-                );
+		// Ongoing
+		long ongoing = examRepository.countOngoing(schoolId, today);
 
-        // Students
-        long students =
-                studentRepository.countBySchoolId(
-                        schoolId
-                );
+		// Students
+		long students = studentRepository.countBySchoolId(schoolId);
 
-        // Average Result
-        Double avg =
-                resultRepository
-                        .getAveragePercentage(
-                                schoolId
-                        );
+		// Average Result
+		Double avg = resultRepository.getAveragePercentage(schoolId);
 
-        return new ExamDashboardDTO(
-                upcoming,
-                ongoing,
-                students,
-                avg == null ? 0 : avg
-        );
-    }
-	
-	public List<RecentResultDTO> getRecentResults(
-	        Long schoolId
-	) {
+		return new ExamDashboardDTO(upcoming, ongoing, students, avg == null ? 0 : avg);
+	}
 
-	    List<Object[]> rows =
-	    		resultRepository.getRecentResults(schoolId);
+	public List<RecentResultDTO> getRecentResults(Long schoolId) {
 
-	    List<RecentResultDTO> list =
-	            new ArrayList<>();
+		List<Object[]> rows = resultRepository.getRecentResults(schoolId);
 
-	    for (Object[] row : rows) {
+		return rows.stream().map(r -> new RecentResultDTO(
 
-	        Long examId =
-	                ((Number) row[0]).longValue();
+				// examName
+				r[0] != null ? r[0].toString() : "",
 
-	        String topperName =
-	        		resultRepository.findTopperName(examId);
+				// className
+				r[1] != null ? r[1].toString() : "",
 
-	        Double topperPercentage =
-	        		resultRepository.findTopperPercentage(examId);
+				// students
+				r[2] != null ? ((Number) r[2]).longValue() : 0L,
 
-	        list.add(
+				// average
+				r[3] != null ? ((Number) r[3]).doubleValue() : 0.0,
 
-	            new RecentResultDTO(
+				// topperName
+				r[4] != null ? r[4].toString() : "-",
 
-	                    (String) row[1],
+				// topperPercentage
+				r[5] != null ? ((Number) r[5]).doubleValue() : 0.0,
 
-	                    (String) row[2],
+				// publishedOn
+				r[6] != null ? r[6].toString() : "",
 
-	                    ((Number) row[3]).longValue(),
+				// smsSent
+				r[7] != null && Boolean.parseBoolean(r[7].toString())
 
-	                    ((Number) row[4]).doubleValue(),
-
-	                    topperName,
-
-	                    topperPercentage,
-
-	                    row[5] != null
-	                            ? row[5].toString()
-	                            : "",
-
-	                    true
-	            )
-	        );
-	    }
-
-	    return list;
+		)).toList();
 	}
 
 }

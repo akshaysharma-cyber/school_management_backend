@@ -18,26 +18,40 @@ public interface StudentResultRepository extends JpaRepository<StudentResult, Lo
 			FROM StudentResult r
 			WHERE r.schoolId = :schoolId
 			""")
-			Double getAveragePercentage(
-			    @Param("schoolId") Long schoolId
-			);
+	Double getAveragePercentage(@Param("schoolId") Long schoolId);
 
-	@Query(
-			value = """
+	@Query(value = """
 			SELECT
-			e.id,
 			e.exam_name,
 			e.class_name,
 			COUNT(r.id),
 			COALESCE(AVG(r.percentage),0),
-			e.result_publish_date
 
-			FROM student_results r
+			(
+			SELECT s.full_name
+			FROM student_results sr
+			JOIN students s
+			ON s.id = sr.student_id
+			WHERE sr.exam_id = e.id
+			ORDER BY sr.percentage DESC
+			LIMIT 1
+			),
 
-			INNER JOIN exams e
-			ON r.exam_id = e.id
+			(
+			SELECT MAX(sr2.percentage)
+			FROM student_results sr2
+			WHERE sr2.exam_id = e.id
+			),
 
-			WHERE e.school_id = :schoolId
+			e.result_publish_date,
+			true
+
+			FROM exams e
+
+			LEFT JOIN student_results r
+			ON r.exam_id=e.id
+
+			WHERE e.school_id=:schoolId
 
 			GROUP BY
 			e.id,
@@ -46,40 +60,54 @@ public interface StudentResultRepository extends JpaRepository<StudentResult, Lo
 			e.result_publish_date
 
 			ORDER BY e.result_publish_date DESC
-			""",
-			nativeQuery = true
+			LIMIT 5
+			""", nativeQuery = true)
+	List<Object[]> getRecentResults(@Param("schoolId") Long schoolId);
+
+	@Query(value = """
+			SELECT *
+			FROM student_results
+			WHERE exam_id=:examId
+			ORDER BY percentage DESC
+			LIMIT 1
+			""", nativeQuery = true)
+	String findTopperName(@Param("examId") Long examId);
+
+	@Query(value = """
+			SELECT COALESCE(MAX(percentage),0)
+			FROM student_results
+			WHERE exam_id=:examId
+			""", nativeQuery = true)
+	Double findTopperPercentage(@Param("examId") Long examId);
+
+	@Query(value = """
+
+			SELECT
+
+			sub.subject_name,
+
+			sm.max_marks,
+
+			sm.marks_obtained,
+
+			ROUND(
+			(sm.marks_obtained*100)
+			/ sm.max_marks,
+			2
 			)
-			List<Object[]> getRecentResults(
-			        @Param("schoolId")
-			        Long schoolId
-			);
-			
-			@Query(
-					value = """
-					SELECT *
-					FROM student_results
-					WHERE exam_id=:examId
-					ORDER BY percentage DESC
-					LIMIT 1
-					""",
-					nativeQuery = true
-					)
-					String findTopperName(
-					        @Param("examId")
-					        Long examId
-					);
 
+			FROM student_marks sm
 
-			@Query(
-					value = """
-					SELECT COALESCE(MAX(percentage),0)
-					FROM student_results
-					WHERE exam_id=:examId
-					""",
-					nativeQuery = true
-					)
-					Double findTopperPercentage(
-					        @Param("examId")
-					        Long examId
-					);
+			JOIN subjects sub
+			ON sub.id = sm.subject_id
+
+			WHERE sm.student_id = :studentId
+
+			ORDER BY sub.subject_name
+
+			""", nativeQuery = true)
+
+	List<Object[]> getReport(@Param("studentId") Long studentId);
+	
+	Optional<StudentResult> findByStudentId(Long studentId);
 }
