@@ -17,14 +17,18 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 	        Attendance.Status status
 	);
 	
-	List<Attendance> findBySchoolIdAndClassNameAndSectionAndAttendanceDate(
+	List<Attendance> findBySchoolIdAndClassNameAndAttendanceDate(
 
 	        Long schoolId,
 
 	        String className,
 
-	        String section,
-
+	        LocalDate attendanceDate
+	);
+	
+	boolean existsBySchoolIdAndClassNameAndAttendanceDate(
+	        Long schoolId,
+	        String className,
 	        LocalDate attendanceDate
 	);
 

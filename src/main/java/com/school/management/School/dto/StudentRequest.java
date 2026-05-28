@@ -18,8 +18,15 @@ public class StudentRequest {
     private String parentMobile;
     private String parentEmail;
     private String address;
+    private String academicYear;
 
-    private String className;
+    public String getAcademicYear() {
+		return academicYear;
+	}
+	public void setAcademicYear(String academicYear) {
+		this.academicYear = academicYear;
+	}
+	private String className;
     private String section;
 	public Long getSchoolId() {
 		return schoolId;

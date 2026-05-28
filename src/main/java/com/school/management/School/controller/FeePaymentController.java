@@ -17,7 +17,9 @@ import com.school.management.School.dto.CollectFeeRequest;
 import com.school.management.School.dto.FeeDashboardResponse;
 import com.school.management.School.dto.RecentPaymentResponse;
 import com.school.management.School.entity.FeeDetailsResponse;
+import com.school.management.School.entity.FeePayment;
 import com.school.management.School.entity.StudentFees;
+import com.school.management.School.repository.FeePaymentRepository;
 import com.school.management.School.repository.StudentFeesRepository;
 import com.school.management.School.service.FeePaymentService;
 
@@ -28,6 +30,8 @@ public class FeePaymentController {
     private FeePaymentService feePaymentService;
 	@Autowired
 	private StudentFeesRepository feesRepository;
+	@Autowired
+    private FeePaymentRepository feePaymentRepository;
 	
 	
 
@@ -84,6 +88,35 @@ public class FeePaymentController {
 
         return feePaymentService
                 .getClassCollection(schoolId);
+    }
+    
+    // =========================================
+    // PAYMENT HISTORY
+    // =========================================
+
+    @GetMapping(
+            "/payment-history/{schoolId}/{studentFeeId}"
+    )
+
+    public ResponseEntity<?> getPaymentHistory(
+
+            @PathVariable Long schoolId,
+
+            @PathVariable Long studentFeeId
+
+    ) {
+
+        List<FeePayment> payments =
+
+                feePaymentRepository
+                        .findBySchoolIdAndStudentFeeIdOrderByPaymentDateAsc(
+                                schoolId,
+                                studentFeeId
+                        );
+
+        return ResponseEntity.ok(
+                payments
+        );
     }
 
 }

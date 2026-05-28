@@ -21,13 +21,6 @@ public class AttendanceRequest {
 		this.className = className;
 	}
 
-	public String getSection() {
-		return section;
-	}
-
-	public void setSection(String section) {
-		this.section = section;
-	}
 
 	public String getDate() {
 		return date;
@@ -46,8 +39,16 @@ public class AttendanceRequest {
 	}
 
 	private String className;
-    private String section;
-    private String date;
+	private String role;
+    public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	private String date;
 
     // Only absent/leave students
     private List<StudentAttendance> markedStudents;

@@ -54,12 +54,32 @@ public class LoginResponse {
 
 	private Long userId;
     private Long schoolId;
+    private String token;
+    private String refreshToken;
 
-    public LoginResponse(String message, String fullName, String role,Long userId,Long schoolId) {
+    public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
+	public LoginResponse(String message, String fullName, String role,Long userId,Long schoolId,String token,String refreshToken) {
         this.message = message;
         this.fullName = fullName;
         this.role = role;
         this.userId = userId;
         this.schoolId = schoolId;
+        this.token=token;
+        this.refreshToken=refreshToken;
     }
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
 }

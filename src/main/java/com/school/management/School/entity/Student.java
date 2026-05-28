@@ -12,12 +12,12 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "students")
 public class Student {
-	
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    public Long getId() {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	public Long getId() {
 		return id;
 	}
 
@@ -145,16 +145,16 @@ public class Student {
 		this.className = className;
 	}
 
-	public String getSection() {
-		return section;
-	}
-
-	public void setSection(String section) {
-		this.section = section;
-	}
-
 	public String getPhotoUrl() {
 		return photoUrl;
+	}
+
+	public String getAcademicYear() {
+		return academicYear;
+	}
+
+	public void setAcademicYear(String academicYear) {
+		this.academicYear = academicYear;
 	}
 
 	public void setPhotoUrl(String photoUrl) {
@@ -179,29 +179,29 @@ public class Student {
 
 	private Long schoolId;
 
-    private String admissionNumber;
-    private String fullName;
-    private LocalDate dateOfBirth;
-    private String gender;
-    private String bloodGroup;
-    private String category;
-    private String religion;
-    private String nationality;
+	private String admissionNumber;
+	private String fullName;
+	private LocalDate dateOfBirth;
+	private String gender;
+	private String bloodGroup;
+	private String category;
+	private String religion;
+	private String nationality;
 
-    private String parentName;
-    private String relationship;
-    private String parentMobile;
-    private String parentEmail;
-    private String address;
+	private String parentName;
+	private String relationship;
+	private String parentMobile;
+	private String parentEmail;
+	private String address;
 
-    private String className;
-    private String section;
+	private String className;
+	private String academicYear;
 
-    private String photoUrl;
-    private String birthCertificateUrl;
+	private String photoUrl;
+	private String birthCertificateUrl;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private Boolean active = true;
+	private LocalDateTime createdAt = LocalDateTime.now();
+	private Boolean active = true;
 
 	public Boolean getActive() {
 		return active;

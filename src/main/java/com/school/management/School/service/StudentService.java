@@ -74,7 +74,7 @@ public class StudentService {
 
 		student.setClassName(request.getClassName());
 
-		student.setSection(request.getSection());
+		student.setAcademicYear(request.getAcademicYear());
 
 		student.setActive(true);
 
@@ -183,7 +183,7 @@ public class StudentService {
 			student.setAddress(updatedStudent.getAddress());
 
 			student.setClassName(updatedStudent.getClassName());
-			student.setSection(updatedStudent.getSection());
+
 			student.setActive(false);
 			return studentRepository.save(student);
 		}

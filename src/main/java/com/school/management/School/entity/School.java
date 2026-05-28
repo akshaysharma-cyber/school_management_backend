@@ -1,6 +1,7 @@
 package com.school.management.School.entity;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -131,5 +132,45 @@ public class School {
     private Status status = Status.ACTIVE;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    
+    public void generateSchoolCode() {
+
+        if (this.schoolCode == null || this.schoolCode.isBlank()) {
+
+            String schoolPart =
+                    schoolName
+                    .replaceAll("[^A-Za-z ]", "")
+                    .toUpperCase();
+
+            String[] words = schoolPart.split("\\s+");
+
+            StringBuilder code = new StringBuilder();
+
+            for (String w : words) {
+                if (!w.isEmpty()) {
+                    code.append(w.charAt(0));
+                }
+            }
+
+            String cityPart =
+                    city
+                    .replaceAll("[^A-Za-z]", "")
+                    .toUpperCase();
+
+            if (cityPart.length() > 3) {
+                cityPart =
+                        cityPart.substring(0, 3);
+            }
+
+            int random =
+                    100 +
+                    new Random().nextInt(900);
+
+            this.schoolCode =
+                    code +
+                    cityPart +
+                    random;
+        }
+    }
 
 }

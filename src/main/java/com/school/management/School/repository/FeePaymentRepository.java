@@ -52,7 +52,7 @@ public interface FeePaymentRepository extends JpaRepository<FeePayment, Long> {
 			ORDER BY fp.createdAt DESC
 			""")
 	List<RecentPaymentResponse> getRecentPayments(Long schoolId);
-	
+
 	@Query("""
 
 			SELECT new com.school.management.School.dto.ClassCollectionResponse(
@@ -76,6 +76,11 @@ public interface FeePaymentRepository extends JpaRepository<FeePayment, Long> {
 			GROUP BY st.className
 
 			""")
-			List<ClassCollectionResponse>
-			getClassCollection(Long schoolId);
+	List<ClassCollectionResponse> getClassCollection(Long schoolId);
+
+	List<FeePayment> findBySchoolIdAndStudentFeeIdOrderByPaymentDateAsc(
+
+			Long schoolId,
+
+			Long studentFeeId);
 }

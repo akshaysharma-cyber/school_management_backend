@@ -34,8 +34,7 @@ public class FeeAssignmentService {
 				.orElseThrow(() -> new RuntimeException("Fee structure not found"));
 
 		// 🔹 2. Get Students
-		List<Student> students = studentRepository.findByClassNameAndSection(request.getClassName(),
-				request.getSection());
+		List<Student> students = studentRepository.findByClassName(request.getClassName());
 
 		if (students.isEmpty()) {
 			throw new RuntimeException("No students found");
@@ -58,7 +57,6 @@ public class FeeAssignmentService {
 			sf.setFeeStructureId(fs.getId());
 
 			sf.setClassName(student.getClassName());
-			sf.setSection(student.getSection());
 			sf.setAcademicYear(request.getAcademicYear());
 
 			sf.setTotalAmount(fs.getTotalAmount());

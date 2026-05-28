@@ -30,12 +30,24 @@ public class TeacherController {
 	@PostMapping("/add")
 	public ResponseEntity<?> addTeacher(@RequestBody CreateTeacherRequest request) {
 
-	    String message = teacherService.createTeacher(request);
+		try {
 
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("message", message);
+			String message = teacherService.createTeacher(request);
 
-	    return ResponseEntity.ok(response);
+			Map<String, Object> response = new HashMap<>();
+
+			response.put("message", message);
+
+			return ResponseEntity.ok(response);
+
+		} catch (RuntimeException e) {
+
+			Map<String, Object> error = new HashMap<>();
+
+			error.put("message", e.getMessage());
+
+			return ResponseEntity.badRequest().body(error);
+		}
 	}
 	
 	// GET ALL TEACHERS

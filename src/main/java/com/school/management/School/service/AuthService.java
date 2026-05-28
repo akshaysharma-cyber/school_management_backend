@@ -1,5 +1,7 @@
 package com.school.management.School.service;
 
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,85 +14,130 @@ import com.school.management.School.entity.School;
 import com.school.management.School.entity.User;
 import com.school.management.School.repository.SchoolRepository;
 import com.school.management.School.repository.UserRepository;
+import com.school.management.School.utility.JwtService;
 
 @Service
 public class AuthService {
-	
+
 	@Autowired
-    private UserRepository userRepository;
+	private UserRepository userRepository;
 
-    @Autowired
-    private SchoolRepository schoolRepository;
+	@Autowired
+	private SchoolRepository schoolRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
-    
-    public String signup(SignupRequest request) {
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-        // check email exists
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
+	@Autowired
+	private JwtService jwtService;
 
-        User user = new User();
-        user.setFullName(request.getFullName());
-        user.setMobile(request.getMobile());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
+	public String signup(SignupRequest request) {
 
-        // 🔥 Important Logic
-        if (request.getRole() == Role.SCHOOL_ADMIN) {
+		// check email exists
+		if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+			throw new RuntimeException("Email already exists");
+		}
 
-            if (request.getCity() == null || request.getState() == null || request.getSchoolEmail() == null) {
-                throw new RuntimeException("City, State and School Email are required");
-            }
+		User user = new User();
+		user.setFullName(request.getFullName());
+		user.setMobile(request.getMobile());
+		user.setEmail(request.getEmail());
+		user.setPassword(passwordEncoder.encode(request.getPassword()));
+		user.setRole(request.getRole());
 
-            School school = new School();
-            school.setSchoolName(request.getSchoolName());
-            school.setCity(request.getCity());
-            school.setState(request.getState());
-            school.setEmail(request.getSchoolEmail());
+		// 🔥 Important Logic
+		if (request.getRole() == Role.SCHOOL_ADMIN) {
 
-            school = schoolRepository.save(school);
-            user.setSchool(school);
-        } else if (request.getRole() == Role.TEACHER) {
+			if (request.getCity() == null || request.getState() == null || request.getSchoolEmail() == null) {
+				throw new RuntimeException("City, State and School Email are required");
+			}
 
-            throw new RuntimeException("Teacher signup must include schoolId");
+			School school = new School();
+			school.setSchoolName(request.getSchoolName());
+			school.setCity(request.getCity());
+			school.setState(request.getState());
+			school.setEmail(request.getSchoolEmail());
+			school.setSchoolCode(generateSchoolCode(request.getSchoolName(), request.getCity(), school.getState()));
 
-        } else if (request.getRole() == Role.SUPER_ADMIN) {
+			school = schoolRepository.save(school);
+			user.setSchool(school);
+		} else if (request.getRole() == Role.TEACHER) {
 
-            user.setSchool(null); // no school
+			throw new RuntimeException("Teacher signup must include schoolId");
 
-        }
+		} else if (request.getRole() == Role.SUPER_ADMIN) {
 
-        userRepository.save(user);
+			user.setSchool(null); // no school
 
-        return "User registered successfully";
-    }
-    
-    
-    public LoginResponse login(LoginRequest request) {
+		}
 
-        User user = userRepository.findByMobile(request.getMobile())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+		userRepository.save(user);
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
-        }
+		return "User registered successfully";
+	}
 
-        if (!user.getIsActive()) {
-            throw new RuntimeException("User is inactive");
-        }
+	private String generateSchoolCode(String schoolName, String city,String state) {
 
-        return new LoginResponse(
-                "Login successful",
-                user.getFullName(),
-                user.getRole().name(),
-                user.getId(),
-                user.getSchool().getId()
-        );
-    }
+		String school = schoolName.replaceAll("[^A-Za-z ]", "").toUpperCase();
+
+		StringBuilder initials = new StringBuilder();
+
+		for (String word : school.split("\\s+")) {
+
+			if (!word.isEmpty()) {
+				initials.append(word.charAt(0));
+			}
+		}
+
+		String cityPart = city.replaceAll("[^A-Za-z]", "").toUpperCase();
+
+		cityPart = cityPart.length() > 3 ? cityPart.substring(0, 3) : cityPart;
+
+		String stateCode = state.replaceAll("[^A-Za-z]", "").toUpperCase();
+
+		stateCode = stateCode.length() > 2 ? stateCode.substring(0, 2) : stateCode;
+
+		int random = 100 + new Random().nextInt(900);
+
+		return initials + cityPart +stateCode+ random;
+	}
+
+	public LoginResponse login(LoginRequest request) {
+
+		User user = userRepository.findByMobile(request.getMobile())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+
+			throw new RuntimeException("Invalid password");
+
+		}
+
+		if (!user.getIsActive()) {
+
+			throw new RuntimeException("User inactive");
+
+		}
+
+		String token = jwtService.generateToken(user.getMobile());
+		String refreshToken = jwtService.generateRefreshToken(user.getMobile());
+
+		return new LoginResponse(
+
+				"Login successful",
+
+				user.getFullName(),
+
+				user.getRole().name(),
+
+				user.getId(),
+
+				user.getSchool() != null ? user.getSchool().getId() : null,
+
+				token,
+
+				refreshToken);
+
+	}
 
 }

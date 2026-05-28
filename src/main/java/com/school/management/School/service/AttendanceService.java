@@ -28,63 +28,103 @@ public class AttendanceService {
 
 		LocalDate date = LocalDate.parse(request.getDate());
 
-		// 🔹 Step 1: Get all students of class
-		List<Student> students = studentRepository.findBySchoolIdAndClassNameAndSection(request.getSchoolId(),
-				request.getClassName(), request.getSection());
+		if ("TEACHER".equalsIgnoreCase(request.getRole())) {
 
-		// 🔹 Step 2: Convert marked list to map
+			if (!date.equals(LocalDate.now())) {
+
+				throw new RuntimeException("Teacher can edit attendance only for today");
+			}
+		}
+
+		// 🔹 Step 1: Get all students of class
+		List<Student> students = studentRepository.findBySchoolIdAndClassName(request.getSchoolId(),
+				request.getClassName());
+
+		// =========================================
+		// ABSENT STUDENTS MAP
+		// =========================================
+
 		Map<Long, String> markedMap = new HashMap<>();
 
 		if (request.getMarkedStudents() != null) {
+
 			for (AttendanceRequest.StudentAttendance s : request.getMarkedStudents()) {
+
 				markedMap.put(s.getStudentId(), s.getStatus());
 			}
 		}
 
-		// 🔹 Step 3: Loop all students
+		boolean updated = false;
+
+		// =========================================
+		// SAVE ATTENDANCE
+		// =========================================
+
 		for (Student student : students) {
 
 			Attendance.Status status;
 
+			// If teacher marked absent
 			if (markedMap.containsKey(student.getId())) {
+
 				status = Attendance.Status.valueOf(markedMap.get(student.getId()));
+
 			} else {
-				status = Attendance.Status.PRESENT; // ✅ default
+
+				// Default Present
+				status = Attendance.Status.PRESENT;
 			}
 
-			// 🔹 Step 4: Insert or Update
 			Attendance existing = attendanceRepository.findByStudentIdAndAttendanceDate(student.getId(), date)
 					.orElse(null);
 
+			// =========================
+			// UPDATE EXISTING
+			// =========================
+
 			if (existing != null) {
+
 				existing.setStatus(status);
+
 				attendanceRepository.save(existing);
+
+				updated = true;
+
 			} else {
+
+				// =========================
+				// INSERT NEW
+				// =========================
+
 				Attendance attendance = new Attendance();
+
 				attendance.setSchoolId(request.getSchoolId());
+
 				attendance.setStudentId(student.getId());
+
 				attendance.setClassName(request.getClassName());
-				attendance.setSection(request.getSection());
+
 				attendance.setAttendanceDate(date);
+
 				attendance.setStatus(status);
 
 				attendanceRepository.save(attendance);
 			}
 		}
 
-		return "Attendance saved successfully";
+		return updated ? "Attendance updated successfully" : "Attendance marked successfully";
 	}
 
 	public List<Map<String, Object>> getAttendanceByDate(
 
-			Long schoolId, String className, String section, String date
+			Long schoolId, String className, String date
 
 	) {
 
 		LocalDate attendanceDate = LocalDate.parse(date);
 
-		List<Attendance> attendanceList = attendanceRepository.findBySchoolIdAndClassNameAndSectionAndAttendanceDate(schoolId,
-				className, section, attendanceDate);
+		List<Attendance> attendanceList = attendanceRepository.findBySchoolIdAndClassNameAndAttendanceDate(schoolId,
+				className, attendanceDate);
 
 		List<Map<String, Object>> response = new ArrayList<>();
 

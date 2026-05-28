@@ -29,14 +29,14 @@ public class AttendanceController {
 	private StudentRepository repository;
 
 	@GetMapping("/students")
-	public List<Student> getStudents(@RequestParam Long schoolId, @RequestParam String className,
-			@RequestParam String section) {
+	public List<Student> getStudents(@RequestParam Long schoolId, @RequestParam String className
+			) {
 
 		System.out.println("schoolId = " + schoolId);
 		System.out.println("className = " + className);
-		System.out.println("section = " + section);
+	
 
-		return repository.findBySchoolIdAndClassNameAndSection(schoolId, className, section);
+		return repository.findBySchoolIdAndClassName(schoolId, className);
 	}
 
 	@PostMapping("/mark")
@@ -57,15 +57,13 @@ public class AttendanceController {
 
 			@RequestParam String className,
 
-			@RequestParam String section,
-
 			@RequestParam String date
 
 	) {
 
 		return ResponseEntity.ok(
 
-				attendanceService.getAttendanceByDate(schoolId, className, section, date));
+				attendanceService.getAttendanceByDate(schoolId, className, date));
 	}
 
 }
