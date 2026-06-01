@@ -72,7 +72,8 @@ public class SecurityConfig {
 
                     // Public APIs
                     .requestMatchers(
-                        "/api/auth/**"
+                        "/api/auth/**",
+                        "/api/fees/receipt/**"
                     )
                     .permitAll()
 

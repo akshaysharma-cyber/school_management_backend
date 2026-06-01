@@ -26,47 +26,110 @@ public class FeeAssignmentService {
 	@Autowired
 	private StudentFeesRepository studentFeesRepository;
 
-	public String assignFeeToClass(AssignFeeRequest request) {
+	public String assignFeeToClass(
+	        AssignFeeRequest request
+	) {
 
-		// 🔹 1. Get Fee Structure
-		FeeStructure fs = feeStructureRepository.findBySchoolIdAndClassNameAndAcademicYear(request.getSchoolId(),
-				request.getClassName(), request.getAcademicYear())
-				.orElseThrow(() -> new RuntimeException("Fee structure not found"));
+	    // =========================
+	    // GET FEE STRUCTURE
+	    // =========================
 
-		// 🔹 2. Get Students
-		List<Student> students = studentRepository.findByClassName(request.getClassName());
+	    FeeStructure fs =
+	            feeStructureRepository
+	            .findBySchoolIdAndClassNameAndAcademicYear(
+	                    request.getSchoolId(),
+	                    request.getClassName(),
+	                    request.getAcademicYear()
+	            )
+	            .orElseThrow(() ->
+	                    new RuntimeException(
+	                            "Fee structure not found"
+	                    )
+	            );
 
-		if (students.isEmpty()) {
-			throw new RuntimeException("No students found");
-		}
+	    // =========================
+	    // GET STUDENTS OF SAME SCHOOL
+	    // =========================
 
-		// 🔹 3. Assign Fee to Each Student
-		for (Student student : students) {
+	    List<Student> students =
+	            studentRepository
+	            .findBySchoolIdAndClassName(
+	                    request.getSchoolId(),
+	                    request.getClassName()
+	            );
 
-			// prevent duplicate
-			boolean exists = studentFeesRepository
-					.findByStudentIdAndAcademicYear(student.getId(), request.getAcademicYear()).isPresent();
+	    if (students.isEmpty()) {
 
-			if (exists)
-				continue;
+	        throw new RuntimeException(
+	                "No students found"
+	        );
+	    }
 
-			StudentFees sf = new StudentFees();
+	    // =========================
+	    // ASSIGN FEES
+	    // =========================
 
-			sf.setStudentId(student.getId());
-			sf.setSchoolId(request.getSchoolId());
-			sf.setFeeStructureId(fs.getId());
+	    int assignedCount = 0;
 
-			sf.setClassName(student.getClassName());
-			sf.setAcademicYear(request.getAcademicYear());
+	    for (Student student : students) {
 
-			sf.setTotalAmount(fs.getTotalAmount());
-			sf.setPaidAmount(0.0);
-			sf.setDueAmount(fs.getTotalAmount());
-			sf.setStatus(StudentFees.Status.PENDING);
+	        boolean exists =
+	                studentFeesRepository
+	                .findByStudentIdAndSchoolIdAndAcademicYear(
+	                        student.getId(),
+	                        request.getSchoolId(),
+	                        request.getAcademicYear()
+	                )
+	                .isPresent();
 
-			studentFeesRepository.save(sf);
-		}
+	        if (exists) {
+	            continue;
+	        }
 
-		return "Fee assigned to class successfully";
+	        StudentFees sf = new StudentFees();
+
+	        sf.setStudentId(student.getId());
+
+	        sf.setSchoolId(request.getSchoolId());
+
+	        sf.setFeeStructureId(fs.getId());
+
+	        sf.setClassName(student.getClassName());
+
+	        sf.setAcademicYear(
+	                request.getAcademicYear()
+	        );
+
+	        sf.setTotalAmount(
+	                fs.getTotalAmount()
+	        );
+
+	        sf.setPaidAmount(0.0);
+
+	        sf.setDueAmount(
+	                fs.getTotalAmount()
+	        );
+
+	        sf.setStatus(
+	                StudentFees.Status.PENDING
+	        );
+
+	        studentFeesRepository.save(sf);
+
+	        assignedCount++;
+	    }
+
+	    // =========================
+	    // RESPONSE
+	    // =========================
+
+	    if (assignedCount == 0) {
+
+	        return "Fee already assigned to all students";
+	    }
+
+	    return "Fee assigned successfully to "
+	            + assignedCount
+	            + " students";
 	}
 }

@@ -83,4 +83,6 @@ public interface FeePaymentRepository extends JpaRepository<FeePayment, Long> {
 			Long schoolId,
 
 			Long studentFeeId);
+
+	List<FeePayment> findBySchoolIdAndStudentFeeId(Long schoolId, Long studentFeeId);
 }

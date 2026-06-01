@@ -16,9 +16,19 @@ public class FeeStructureController {
 	@Autowired
     private FeeStructureService feeStructureService;
 
-    @PostMapping("/structure")
-    public ResponseEntity<?> create(@RequestBody FeeStructureRequest request) {
-        return ResponseEntity.ok(feeStructureService.createFeeStructure(request));
-    }
+	@PostMapping("/structure")
+	public ResponseEntity<?> create(@RequestBody FeeStructureRequest request) {
+
+		try {
+
+			String message = feeStructureService.createFeeStructure(request);
+
+			return ResponseEntity.ok(message);
+
+		} catch (RuntimeException e) {
+
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
 
 }

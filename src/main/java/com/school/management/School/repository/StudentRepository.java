@@ -30,5 +30,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 	 long countBySchoolId(Long schoolId);
 	 
 	 List<Student> findBySchoolId(Long schoolId);
-
+	 
+	 
 }

@@ -53,4 +53,12 @@ public interface StudentFeesRepository extends JpaRepository<StudentFees, Long> 
     	       WHERE s.schoolId = :schoolId
     	       """)
     	Double getPendingAmount(Long schoolId);
+    
+   //using in fee assignment 
+    Optional<StudentFees>
+    findByStudentIdAndSchoolIdAndAcademicYear(
+            Long studentId,
+            Long schoolId,
+            String academicYear
+    );
 }

@@ -1,9 +1,13 @@
 package com.school.management.School.controller;
 
+import java.io.ByteArrayInputStream;
+
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +26,7 @@ import com.school.management.School.entity.StudentFees;
 import com.school.management.School.repository.FeePaymentRepository;
 import com.school.management.School.repository.StudentFeesRepository;
 import com.school.management.School.service.FeePaymentService;
+import com.school.management.School.service.ReceiptPdfService;
 
 @RestController
 @RequestMapping("/api/fees")
@@ -32,6 +37,9 @@ public class FeePaymentController {
 	private StudentFeesRepository feesRepository;
 	@Autowired
     private FeePaymentRepository feePaymentRepository;
+	
+	@Autowired
+	private ReceiptPdfService pdfService;
 	
 	
 
@@ -118,5 +126,27 @@ public class FeePaymentController {
                 payments
         );
     }
+    
+    @GetMapping("/receipt/{schoolId}/{studentId}/{studentFeeId}")
+    public ResponseEntity<byte[]> downloadReceipt(
+            @PathVariable Long schoolId,
+            @PathVariable Long studentId,
+            @PathVariable Long studentFeeId
+    ) {
 
+        byte[] pdf =
+        		pdfService.generateReceipt(
+                        schoolId,
+                        studentId,
+                        studentFeeId
+                );
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=fee_receipt.pdf"
+                )
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
 }
