@@ -4,31 +4,23 @@ import java.util.List;
 
 public class CreateExamRequest {
 	private Long schoolId;
-    private String examName;
-    private String examType;
+	private String examName;
+	private String examType;
+	private String className;
+	private String academicYear;
+	private String startDate;
+	private String endDate;
+	private String description;
+	private Double passingPercentage;
+	private String gradingSystem;
+	private String resultPublishDate;
+	private Boolean allowReexam;
+	private Boolean allowMarksEntry;
+	private Boolean sendSms;
 
-    private String className;
-    private String section;
+	private List<SubjectDto> subjects;
 
-    private String academicYear;
-
-    private String startDate;
-    private String endDate;
-
-    private String description;
-
-    private Double passingPercentage;
-    private String gradingSystem;
-
-    private String resultPublishDate;
-
-    private Boolean allowReexam;
-    private Boolean allowMarksEntry;
-    private Boolean sendSms;
-
-    private List<SubjectDto> subjects;
-
-    public Long getSchoolId() {
+	public Long getSchoolId() {
 		return schoolId;
 	}
 
@@ -58,14 +50,6 @@ public class CreateExamRequest {
 
 	public void setClassName(String className) {
 		this.className = className;
-	}
-
-	public String getSection() {
-		return section;
-	}
-
-	public void setSection(String section) {
-		this.section = section;
 	}
 
 	public String getAcademicYear() {
@@ -155,7 +139,5 @@ public class CreateExamRequest {
 	public void setSubjects(List<SubjectDto> subjects) {
 		this.subjects = subjects;
 	}
-
-	
 
 }

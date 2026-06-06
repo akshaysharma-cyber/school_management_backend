@@ -83,31 +83,36 @@ public interface StudentResultRepository extends JpaRepository<StudentResult, Lo
 	@Query(value = """
 
 			SELECT
-
-			sub.subject_name,
-
-			sm.max_marks,
-
-			sm.marks_obtained,
-
-			ROUND(
-			(sm.marks_obtained*100)
-			/ sm.max_marks,
-			2
-			)
+			    sub.subject_name,
+			    SUM(sm.max_marks) as total_marks,
+			    SUM(sm.marks_obtained) as obtained_marks
 
 			FROM student_marks sm
 
 			JOIN subjects sub
-			ON sub.id = sm.subject_id
+			    ON sub.id = sm.subject_id
+
+			JOIN exams e
+			    ON e.id = sm.exam_id
 
 			WHERE sm.student_id = :studentId
+			AND e.academic_year = :academicYear
+			AND e.class_name = :className
+
+			GROUP BY sub.subject_name
 
 			ORDER BY sub.subject_name
 
 			""", nativeQuery = true)
+			List<Object[]> getConsolidatedReport(
 
-	List<Object[]> getReport(@Param("studentId") Long studentId);
+			        @Param("studentId") Long studentId,
+
+			        @Param("academicYear") String academicYear,
+
+			        @Param("className") String className
+
+			);
 	
 	Optional<StudentResult> findByStudentId(Long studentId);
 }

@@ -11,10 +11,12 @@ import com.school.management.School.dto.StudentResultDto;
 import com.school.management.School.dto.SubjectDto;
 import com.school.management.School.dto.SubjectMarksDto;
 import com.school.management.School.dto.SummaryDto;
+import com.school.management.School.entity.Exam;
 import com.school.management.School.entity.ExamSubject;
 import com.school.management.School.entity.Student;
 import com.school.management.School.entity.StudentMarks;
 import com.school.management.School.entity.Subject;
+import com.school.management.School.repository.ExamRepository;
 import com.school.management.School.repository.ExamSubjectRepository;
 import com.school.management.School.repository.StudentMarksRepository;
 import com.school.management.School.repository.StudentRepository;
@@ -31,8 +33,16 @@ public class ResultService {
 	private SubjectRepository subjectRepository;
 	@Autowired
 	private ExamSubjectRepository examSubjectRepository;
+	@Autowired
+	private ExamRepository examRepository;
 
-	public ResultResponse getResult(Long schoolId, Long examId, String className) {
+	public ResultResponse getResult(Long schoolId, String academicYear, String examType, String className) {
+
+		Exam exam = examRepository
+				.findBySchoolIdAndAcademicYearAndExamTypeAndClassName(schoolId, academicYear, examType, className)
+				.orElseThrow(() -> new RuntimeException("Exam not found"));
+
+		Long examId = exam.getId();
 
 		List<Student> students = studentRepository.findBySchoolIdAndClassName(schoolId, className);
 
@@ -103,14 +113,22 @@ public class ResultService {
 		SummaryDto summary = new SummaryDto();
 
 		double avg = resultList.stream().mapToDouble(StudentResultDto::getPercentage).average().orElse(0);
+
 		double max = resultList.stream().mapToDouble(StudentResultDto::getPercentage).max().orElse(0);
+
 		double min = resultList.stream().mapToDouble(StudentResultDto::getPercentage).min().orElse(0);
 
 		long passed = resultList.stream().filter(r -> r.getResult().equals("Passed")).count();
 
+		long failed = resultList.size() - passed;
+
 		summary.setAverage(avg);
 		summary.setHighest(max);
 		summary.setLowest(min);
+
+		summary.setPassedStudents(passed);
+		summary.setFailedStudents(failed);
+
 		summary.setPassPercentage(resultList.isEmpty() ? 0 : (passed * 100.0) / resultList.size());
 
 		ResultResponse response = new ResultResponse();

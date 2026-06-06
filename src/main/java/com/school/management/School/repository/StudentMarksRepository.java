@@ -21,4 +21,11 @@ public interface StudentMarksRepository extends JpaRepository<StudentMarks, Long
     );
 
     List<StudentMarks> findByExamId(Long examId);
+    
+    List<StudentMarks> findBySchoolIdAndExamIdAndSubjectIdAndClassName(
+            Long schoolId,
+            Long examId,
+            Long subjectId,
+            String className
+    );
 }

@@ -18,18 +18,7 @@ public class ResultController {
 	private ResultService resultService;
 	@Autowired
 	private MarksService marksService;
-
-	/*
-	 * @GetMapping public ResponseEntity<?> getResult(@RequestParam Long
-	 * schoolId, @RequestParam Long examId,
-	 * 
-	 * @RequestParam String className, @RequestParam String section) {
-	 * 
-	 * return ResponseEntity.ok(resultService.getResult(schoolId, examId, className,
-	 * section)); }
-	 */
-	
-	
+		
 	@GetMapping("/subjects")
 	public ResponseEntity<?> getSubjects(
 	        @RequestParam Long schoolId,
@@ -46,19 +35,18 @@ public class ResultController {
 	}
 	
 	@GetMapping("/full-result")
-	public ResponseEntity<?> getSubjectResults(
+	public ResponseEntity<?> getResult(
 	        @RequestParam Long schoolId,
-	        @RequestParam Long examId,
-	        @RequestParam String className
-	       ) {
+	        @RequestParam String academicYear,
+	        @RequestParam String examType,
+	        @RequestParam String className) {
 
 	    return ResponseEntity.ok(
-	    		resultService.getResult(
+	            resultService.getResult(
 	                    schoolId,
-	                    examId,
-	                    className	                   
-	            )
-	    );
+	                    academicYear,
+	                    examType,
+	                    className));
 	}
 
 }

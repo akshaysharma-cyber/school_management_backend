@@ -3,8 +3,17 @@ package com.school.management.School.dto;
 public class ExamSubjectDto {
 	
 	private Long subjectId;
+	private Long examId;
 
-    private String subjectName;
+    public Long getExamId() {
+		return examId;
+	}
+
+	public void setExamId(Long examId) {
+		this.examId = examId;
+	}
+
+	private String subjectName;
 
     private Double maxMarks;
 

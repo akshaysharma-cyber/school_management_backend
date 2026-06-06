@@ -4,16 +4,15 @@ import java.util.List;
 
 public class MarksEntryRequest {
 	private Long schoolId;
-    private Long examId;
+	private Long examId;
 
-    private String className;
-    private String section;
+	private String className;
 
-    private Long subjectId;
+	private Long subjectId;
 
-    private List<StudentMarksDto> marks;
+	private List<StudentMarksDto> marks;
 
-    public Long getSchoolId() {
+	public Long getSchoolId() {
 		return schoolId;
 	}
 
@@ -37,14 +36,6 @@ public class MarksEntryRequest {
 		this.className = className;
 	}
 
-	public String getSection() {
-		return section;
-	}
-
-	public void setSection(String section) {
-		this.section = section;
-	}
-
 	public Long getSubjectId() {
 		return subjectId;
 	}
@@ -62,19 +53,23 @@ public class MarksEntryRequest {
 	}
 
 	public static class StudentMarksDto {
-        public Long getStudentId() {
+		public Long getStudentId() {
 			return studentId;
 		}
+
 		public void setStudentId(Long studentId) {
 			this.studentId = studentId;
 		}
+
 		public Double getMarksObtained() {
 			return marksObtained;
 		}
+
 		public void setMarksObtained(Double marksObtained) {
 			this.marksObtained = marksObtained;
 		}
+
 		private Long studentId;
-        private Double marksObtained;
-    }
+		private Double marksObtained;
+	}
 }

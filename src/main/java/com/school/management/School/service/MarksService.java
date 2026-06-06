@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.school.management.School.dto.ExamSubjectDto;
 import com.school.management.School.dto.MarksEntryRequest;
+import com.school.management.School.dto.StudentMarkResponse;
 import com.school.management.School.entity.Exam;
 import com.school.management.School.entity.ExamSubject;
 import com.school.management.School.entity.StudentMarks;
@@ -22,110 +23,113 @@ import com.school.management.School.repository.SubjectRepository;
 @Service
 @Transactional
 public class MarksService {
-	
-	 @Autowired private StudentMarksRepository marksRepository;
-	    @Autowired private StudentRepository studentRepository;
-	    @Autowired private ExamRepository examRepository;
-	    @Autowired private ExamSubjectRepository examSubjectRepository;
-	    @Autowired
-	    private SubjectRepository SubjectRepository;
 
-	    public String saveMarks(MarksEntryRequest request) {
+	@Autowired
+	private StudentMarksRepository marksRepository;
+	@Autowired
+	private StudentRepository studentRepository;
+	@Autowired
+	private ExamRepository examRepository;
+	@Autowired
+	private ExamSubjectRepository examSubjectRepository;
+	@Autowired
+	private SubjectRepository SubjectRepository;
 
-	        // ✅ 1. Validate exam
-	        Exam exam = examRepository.findById(request.getExamId())
-	                .orElseThrow(() -> new RuntimeException("Exam not found"));
+	public String saveMarks(MarksEntryRequest request) {
 
-	        if (!exam.getSchoolId().equals(request.getSchoolId()) ||
-	            !exam.getClassName().equals(request.getClassName())) {
+		// ✅ 1. Validate exam
+		Exam exam = examRepository.findById(request.getExamId())
+				.orElseThrow(() -> new RuntimeException("Exam not found"));
 
-	            throw new RuntimeException("Invalid exam mapping");
-	        }
+		if (!exam.getSchoolId().equals(request.getSchoolId()) || !exam.getClassName().equals(request.getClassName())) {
 
-	        // ✅ 2. Validate subject
-	        if (!examSubjectRepository.existsByExamIdAndSubjectId(
-	                request.getExamId(),
-	                request.getSubjectId())) {
+			throw new RuntimeException("Invalid exam mapping");
+		}
 
-	            throw new RuntimeException("Subject not part of exam");
-	        }
+		// ✅ 2. Validate subject
+		if (!examSubjectRepository.existsByExamIdAndSubjectId(request.getExamId(), request.getSubjectId())) {
 
-	        // ✅ 3. Save marks
-	        for (MarksEntryRequest.StudentMarksDto s : request.getMarks()) {
+			throw new RuntimeException("Subject not part of exam");
+		}
 
-	            // ✅ student validation
-	            if (!studentRepository.existsByIdAndSchoolIdAndClassName(
-	                    s.getStudentId(),
-	                    request.getSchoolId(),
-	                    request.getClassName())) {
+		// ✅ 3. Save marks
+		for (MarksEntryRequest.StudentMarksDto s : request.getMarks()) {
 
-	                throw new RuntimeException("Invalid student: " + s.getStudentId());
-	            }
+			// ✅ student validation
+			if (!studentRepository.existsByIdAndSchoolIdAndClassName(s.getStudentId(), request.getSchoolId(),
+					request.getClassName())) {
 
-	            StudentMarks entity = marksRepository
-	                    .findBySchoolIdAndExamIdAndStudentIdAndSubjectId(
-	                            request.getSchoolId(),
-	                            request.getExamId(),
-	                            s.getStudentId(),
-	                            request.getSubjectId()
-	                    )
-	                    .orElse(new StudentMarks());
+				throw new RuntimeException("Invalid student: " + s.getStudentId());
+			}
 
-	            entity.setSchoolId(request.getSchoolId());
-	            entity.setExamId(request.getExamId());
-	            entity.setStudentId(s.getStudentId());
-	            entity.setSubjectId(request.getSubjectId());
-	            entity.setMarksObtained(s.getMarksObtained());
-	            entity.setClassName(request.getClassName());
-	            entity.setSection(request.getSection());
+			StudentMarks entity = marksRepository.findBySchoolIdAndExamIdAndStudentIdAndSubjectId(request.getSchoolId(),
+					request.getExamId(), s.getStudentId(), request.getSubjectId()).orElse(new StudentMarks());
 
-	            marksRepository.save(entity);
-	        }
+			entity.setSchoolId(request.getSchoolId());
+			entity.setExamId(request.getExamId());
+			entity.setStudentId(s.getStudentId());
+			entity.setSubjectId(request.getSubjectId());
+			entity.setMarksObtained(s.getMarksObtained());
+			entity.setClassName(request.getClassName());
 
-	        return "Marks saved successfully";
-	    }
-	    
-	    public List<ExamSubjectDto> getSubjects(
-	            Long schoolId,
-	            Long examId,
-	            String className) {
+			marksRepository.save(entity);
+		}
 
-	        Exam exam = examRepository.findById(examId)
-	                .orElseThrow(() -> new RuntimeException("Exam not found"));
+		return "Marks saved successfully";
+	}
 
-	        if (!exam.getSchoolId().equals(schoolId) ||
-	            !exam.getClassName().equals(className)) {
+	public List<ExamSubjectDto> getSubjects(Long schoolId, Long examId, String className) {
 
-	            throw new RuntimeException("Invalid class for exam");
-	        }
+		Exam exam = examRepository.findById(examId).orElseThrow(() -> new RuntimeException("Exam not found"));
 
-	        List<ExamSubject> examSubjects =
-	                examSubjectRepository.findByExamId(examId);
+		if (!exam.getSchoolId().equals(schoolId) || !exam.getClassName().equals(className)) {
 
-	        List<ExamSubjectDto> response = new ArrayList<>();
+			throw new RuntimeException("Invalid class for exam");
+		}
 
-	        for (ExamSubject es : examSubjects) {
+		List<ExamSubject> examSubjects = examSubjectRepository.findByExamId(examId);
 
-	            Subject subject = null;
-				try {
-					subject = SubjectRepository
-					        .findById(es.getSubjectId())
-					        .orElseThrow();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		List<ExamSubjectDto> response = new ArrayList<>();
 
-	            ExamSubjectDto dto = new ExamSubjectDto();
+		for (ExamSubject es : examSubjects) {
 
-	            dto.setSubjectId(subject.getId());
-	            dto.setSubjectName(subject.getSubjectName());
-	            dto.setMaxMarks(es.getMaxMarks());
+			Subject subject = null;
+			try {
+				subject = SubjectRepository.findById(es.getSubjectId()).orElseThrow();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-	            response.add(dto);
-	        }
+			ExamSubjectDto dto = new ExamSubjectDto();
 
-	        return response;
-	    }
+			dto.setSubjectId(subject.getId());
+			dto.setSubjectName(subject.getSubjectName());
+			dto.setMaxMarks(es.getMaxMarks());
 
+			response.add(dto);
+		}
+
+		return response;
+	}
+
+	public List<StudentMarkResponse> getSavedMarks(Long schoolId, Long examId, Long subjectId, String className) {
+
+		List<StudentMarks> marksList = marksRepository.findBySchoolIdAndExamIdAndSubjectIdAndClassName(schoolId, examId,
+				subjectId, className);
+
+		List<StudentMarkResponse> response = new ArrayList<>();
+
+		for (StudentMarks mark : marksList) {
+
+			StudentMarkResponse dto = new StudentMarkResponse();
+
+			dto.setStudentId(mark.getStudentId());
+			dto.setMarksObtained(mark.getMarksObtained());
+
+			response.add(dto);
+		}
+
+		return response;
+	}
 }

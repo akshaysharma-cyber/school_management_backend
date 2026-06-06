@@ -19,72 +19,81 @@ public class ReportCardService {
 	@Autowired
 	private StudentResultRepository resultRepo;
 
-	public ReportCardDTO getReportCard(Long studentId) {
+	public ReportCardDTO getReportCard(Long schoolId,
+	        Long studentId,
+	        String academicYear,
+	        String className) {
 
-	    Student student = studentRepo.findById(studentId)
-	            .orElseThrow(() -> new RuntimeException("Student not found"));
+		Student student = studentRepo
+		        .findBySchoolIdAndId(schoolId, studentId)
+		        .orElseThrow(() ->
+		                new RuntimeException("Student not found"));
+		List<Object[]> rows = resultRepo.getConsolidatedReport(studentId, academicYear, className);
 
-	    List<Object[]> rows = resultRepo.getReport(studentId);
+		List<SubjectResultDTO> subjects = new ArrayList<>();
 
-	    List<SubjectResultDTO> subjects = new ArrayList<>();
+		double totalMarks = 0;
+		double obtainedMarks = 0;
 
-	    double totalMarks = 0;
-	    double obtainedMarks = 0;
+		for (Object[] r : rows) {
 
-	    for (Object[] r : rows) {
+			String subject = r[0] != null ? String.valueOf(r[0]) : "-";
 
-	        String subject = r[0] != null ? String.valueOf(r[0]) : "-";
+			double total = r[1] != null ? ((Number) r[1]).doubleValue() : 0;
 
-	        double total = r[1] != null ? ((Number) r[1]).doubleValue() : 0;
+			double obtained = r[2] != null ? ((Number) r[2]).doubleValue() : 0;
 
-	        double obtained = r[2] != null ? ((Number) r[2]).doubleValue() : 0;
+			double percentage = total > 0 ? (obtained * 100) / total : 0;
 
-	        double percentage = total > 0 ? (obtained * 100) / total : 0;
+			subjects.add(new SubjectResultDTO(subject, total, obtained, percentage, getGrade(percentage)));
 
-	        String grade;
-	        if (percentage >= 91) grade = "A+";
-	        else if (percentage >= 81) grade = "A";
-	        else if (percentage >= 71) grade = "B";
-	        else if (percentage >= 61) grade = "C";
-	        else grade = "D";
+			totalMarks += total;
+			obtainedMarks += obtained;
+		}
 
-	        subjects.add(new SubjectResultDTO(
-	                subject,
-	                total,
-	                obtained,
-	                percentage,   // keep as Double (no Math.round)
-	                grade
-	        ));
+		double overallPercentage = totalMarks > 0 ? (obtainedMarks * 100) / totalMarks : 0;
 
-	        totalMarks += total;
-	        obtainedMarks += obtained;
-	    }
+		ReportCardDTO dto = new ReportCardDTO();
 
-	    StudentResult finalResult = resultRepo.findByStudentId(studentId)
-	            .orElse(null);
+		dto.setStudentName(student.getFullName());
 
-	    ReportCardDTO dto = new ReportCardDTO();
+		dto.setClassName(className);
 
-	    dto.setStudentName(student.getFullName());
-	    dto.setClassName(student.getClassName());
-	    dto.setRollNumber(student.getId());
+		dto.setRollNumber(student.getId());
 
-	    dto.setSubjects(subjects);
+		dto.setSubjects(subjects);
 
-	    // Overall totals (recommended correction)
-	    dto.setTotal(totalMarks);
-	    dto.setObtained(obtainedMarks);
+		dto.setTotal(totalMarks);
 
-	    dto.setPercentage(
-	            finalResult != null ? finalResult.getPercentage() : 0.0
-	    );
+		dto.setObtained(obtainedMarks);
 
-	    dto.setGrade(
-	            finalResult != null ? finalResult.getGrade() : "-"
-	    );
+		dto.setPercentage(overallPercentage);
 
-	    dto.setRank(1);
+		dto.setGrade(getGrade(overallPercentage));
 
-	    return dto;
+		// Later you can calculate actual class rank
+		dto.setRank(1);
+
+		return dto;
+	}
+
+	private String getGrade(double percentage) {
+
+		if (percentage >= 91)
+			return "A+";
+
+		if (percentage >= 81)
+			return "A";
+
+		if (percentage >= 71)
+			return "B";
+
+		if (percentage >= 61)
+			return "C";
+
+		if (percentage >= 33)
+			return "D";
+
+		return "F";
 	}
 }

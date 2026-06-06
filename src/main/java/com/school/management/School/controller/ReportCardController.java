@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.school.management.School.dto.ReportCardDTO;
@@ -16,15 +17,24 @@ public class ReportCardController {
 	@Autowired
 	private ReportCardService service;
 
-	@GetMapping("/student/{studentId}")
+	@GetMapping("/student")
+	public ReportCardDTO getReportCard(
 
-	public ReportCardDTO get(
+	        @RequestParam Long schoolId,
 
-			@PathVariable Long studentId
+	        @RequestParam Long studentId,
+
+	        @RequestParam String academicYear,
+
+	        @RequestParam String className
 
 	) {
 
-		return service.getReportCard(studentId);
-
+	    return service.getReportCard(
+	            schoolId,
+	            studentId,
+	            academicYear,
+	            className
+	    );
 	}
 }

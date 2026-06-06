@@ -56,12 +56,6 @@ public class StudentMarks {
 	public void setClassName(String className) {
 		this.className = className;
 	}
-	public String getSection() {
-		return section;
-	}
-	public void setSection(String section) {
-		this.section = section;
-	}
 	private Long schoolId;
 
     private Long examId;
@@ -71,6 +65,5 @@ public class StudentMarks {
     private Double marksObtained;
 
     private String className;
-    private String section;
 
 }

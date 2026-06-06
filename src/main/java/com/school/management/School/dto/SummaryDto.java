@@ -6,6 +6,20 @@ public class SummaryDto {
     private double highest;
     private double lowest;
     private double passPercentage;
+    private long passedStudents;
+    private long failedStudents;
+	public long getPassedStudents() {
+		return passedStudents;
+	}
+	public void setPassedStudents(long passedStudents) {
+		this.passedStudents = passedStudents;
+	}
+	public long getFailedStudents() {
+		return failedStudents;
+	}
+	public void setFailedStudents(long failedStudents) {
+		this.failedStudents = failedStudents;
+	}
 	public double getAverage() {
 		return average;
 	}
