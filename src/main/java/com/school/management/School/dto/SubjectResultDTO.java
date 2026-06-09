@@ -1,52 +1,67 @@
 package com.school.management.School.dto;
 
+import java.util.List;
+
 public class SubjectResultDTO {
 
-	private String subject;
+    private String subject;
 
-    private Double total;
+    private List<ExamWiseMarksDTO> exams;
 
-    private Double obtained;
+    private Double totalObtained;
+
+    private Double totalMax;
 
     private Double percentage;
 
     private String grade;
 
-    public SubjectResultDTO(){}
-
-    public SubjectResultDTO(
-            String subject,
-            Double total,
-            Double obtained,
-            Double percentage,
-            String grade
-    ) {
-
-        this.subject=subject;
-        this.total=total;
-        this.obtained=obtained;
-        this.percentage=percentage;
-        this.grade=grade;
-
-    }
-
     public String getSubject() {
         return subject;
     }
 
-    public Double getTotal() {
-        return total;
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
-    public Double getObtained() {
-        return obtained;
+    public List<ExamWiseMarksDTO> getExams() {
+        return exams;
+    }
+
+    public void setExams(List<ExamWiseMarksDTO> exams) {
+        this.exams = exams;
+    }
+
+    public Double getTotalObtained() {
+        return totalObtained;
+    }
+
+    public void setTotalObtained(Double totalObtained) {
+        this.totalObtained = totalObtained;
+    }
+
+    public Double getTotalMax() {
+        return totalMax;
+    }
+
+    public void setTotalMax(Double totalMax) {
+        this.totalMax = totalMax;
     }
 
     public Double getPercentage() {
         return percentage;
     }
 
+    public void setPercentage(Double percentage) {
+        this.percentage = percentage;
+    }
+
     public String getGrade() {
         return grade;
     }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
 }

@@ -1,9 +1,14 @@
 package com.school.management.School.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.school.management.School.dto.ExamWiseMarksDTO;
 import com.school.management.School.dto.ReportCardDTO;
 import com.school.management.School.dto.SubjectResultDTO;
 import com.school.management.School.entity.Student;
@@ -19,81 +24,173 @@ public class ReportCardService {
 	@Autowired
 	private StudentResultRepository resultRepo;
 
-	public ReportCardDTO getReportCard(Long schoolId,
-	        Long studentId,
-	        String academicYear,
-	        String className) {
+	 public ReportCardDTO getReportCard(
+	            Long schoolId,
+	            Long studentId,
+	            String academicYear,
+	            String className) {
 
-		Student student = studentRepo
-		        .findBySchoolIdAndId(schoolId, studentId)
-		        .orElseThrow(() ->
-		                new RuntimeException("Student not found"));
-		List<Object[]> rows = resultRepo.getConsolidatedReport(studentId, academicYear, className);
+	        Student student =
+	                studentRepo.findById(studentId)
+	                        .orElseThrow(
+	                                () -> new RuntimeException("Student not found")
+	                        );
 
-		List<SubjectResultDTO> subjects = new ArrayList<>();
+	        List<Object[]> rows =
+	                resultRepo.getConsolidatedReport(
+	                        schoolId,
+	                        studentId,
+	                        academicYear,
+	                        className
+	                );
 
-		double totalMarks = 0;
-		double obtainedMarks = 0;
+	        Map<String, SubjectResultDTO> subjectMap =
+	                new LinkedHashMap<>();
 
-		for (Object[] r : rows) {
+	        double grandTotal = 0;
+	        double grandObtained = 0;
 
-			String subject = r[0] != null ? String.valueOf(r[0]) : "-";
+	        for (Object[] row : rows) {
 
-			double total = r[1] != null ? ((Number) r[1]).doubleValue() : 0;
+	            String subjectName =
+	                    String.valueOf(row[0]);
 
-			double obtained = r[2] != null ? ((Number) r[2]).doubleValue() : 0;
+	            String examType  =
+	                    String.valueOf(row[1]);
 
-			double percentage = total > 0 ? (obtained * 100) / total : 0;
+	            Double maxMarks =
+	                    row[2] == null
+	                            ? 0.0
+	                            : ((Number) row[2]).doubleValue();
 
-			subjects.add(new SubjectResultDTO(subject, total, obtained, percentage, getGrade(percentage)));
+	            Double obtained =
+	                    row[3] == null
+	                            ? 0.0
+	                            : ((Number) row[3]).doubleValue();
 
-			totalMarks += total;
-			obtainedMarks += obtained;
-		}
+	            SubjectResultDTO subjectDto =
+	                    subjectMap.computeIfAbsent(
+	                            subjectName,
+	                            k -> {
 
-		double overallPercentage = totalMarks > 0 ? (obtainedMarks * 100) / totalMarks : 0;
+	                                SubjectResultDTO dto =
+	                                        new SubjectResultDTO();
 
-		ReportCardDTO dto = new ReportCardDTO();
+	                                dto.setSubject(subjectName);
+	                                dto.setExams(new ArrayList<>());
+	                                dto.setTotalObtained(0.0);
+	                                dto.setTotalMax(0.0);
 
-		dto.setStudentName(student.getFullName());
+	                                return dto;
+	                            });
 
-		dto.setClassName(className);
+	            subjectDto.getExams().add(
+	                    new ExamWiseMarksDTO(
+	                    		examType ,
+	                            obtained,
+	                            maxMarks
+	                    )
+	            );
 
-		dto.setRollNumber(student.getId());
+	            subjectDto.setTotalObtained(
+	                    subjectDto.getTotalObtained()
+	                            + obtained
+	            );
 
-		dto.setSubjects(subjects);
+	            subjectDto.setTotalMax(
+	                    subjectDto.getTotalMax()
+	                            + maxMarks
+	            );
+	        }
 
-		dto.setTotal(totalMarks);
+	        List<SubjectResultDTO> subjects =
+	                new ArrayList<>(subjectMap.values());
 
-		dto.setObtained(obtainedMarks);
+	        for (SubjectResultDTO dto : subjects) {
 
-		dto.setPercentage(overallPercentage);
+	            grandObtained += dto.getTotalObtained();
 
-		dto.setGrade(getGrade(overallPercentage));
+	            grandTotal += dto.getTotalMax();
 
-		// Later you can calculate actual class rank
-		dto.setRank(1);
+	            double percent =
+	                    dto.getTotalMax() > 0
+	                            ? (dto.getTotalObtained() * 100.0)
+	                            / dto.getTotalMax()
+	                            : 0;
 
-		return dto;
-	}
+	            dto.setPercentage(
+	                    Math.round(percent * 100.0) / 100.0
+	            );
 
-	private String getGrade(double percentage) {
+	            dto.setGrade(
+	                    getGrade(percent)
+	            );
+	        }
 
-		if (percentage >= 91)
-			return "A+";
+	        double overallPercentage =
+	                grandTotal > 0
+	                        ? (grandObtained * 100.0)
+	                        / grandTotal
+	                        : 0;
 
-		if (percentage >= 81)
-			return "A";
+	        ReportCardDTO report =
+	                new ReportCardDTO();
 
-		if (percentage >= 71)
-			return "B";
+	        report.setStudentName(
+	                student.getFullName()
+	        );
 
-		if (percentage >= 61)
-			return "C";
+	        report.setClassName(
+	                student.getClassName()
+	        );
 
-		if (percentage >= 33)
-			return "D";
+	        report.setRollNumber(
+	                student.getId()
+	        );
 
-		return "F";
-	}
+	        report.setSubjects(
+	                subjects
+	        );
+
+	        report.setTotal(
+	                grandTotal
+	        );
+
+	        report.setObtained(
+	                grandObtained
+	        );
+
+	        report.setPercentage(
+	                Math.round(overallPercentage * 100.0)
+	                        / 100.0
+	        );
+
+	        report.setGrade(
+	                getGrade(overallPercentage)
+	        );
+
+	        report.setRank(1);
+
+	        return report;
+	    }
+
+	    private String getGrade(double percentage) {
+
+	        if (percentage >= 91)
+	            return "A+";
+
+	        if (percentage >= 81)
+	            return "A";
+
+	        if (percentage >= 71)
+	            return "B";
+
+	        if (percentage >= 61)
+	            return "C";
+
+	        if (percentage >= 33)
+	            return "D";
+
+	        return "F";
+	    }
 }
