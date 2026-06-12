@@ -21,48 +21,55 @@ public interface StudentResultRepository extends JpaRepository<StudentResult, Lo
 	Double getAveragePercentage(@Param("schoolId") Long schoolId);
 
 	@Query(value = """
-			SELECT
-			e.exam_name,
-			e.class_name,
-			COUNT(r.id),
-			COALESCE(AVG(r.percentage),0),
+					 SELECT
+			    e.exam_type,
+			    e.class_name,
+			    COUNT(DISTINCT r.student_id),
+			    COALESCE(AVG(r.percentage),0),
 
-			(
-			SELECT s.full_name
-			FROM student_results sr
-			JOIN students s
-			ON s.id = sr.student_id
-			WHERE sr.exam_id = e.id
-			ORDER BY sr.percentage DESC
-			LIMIT 1
-			),
+			    (
+			        SELECT s.full_name
+			        FROM student_results sr
+			        JOIN students s
+			            ON s.id = sr.student_id
+			        WHERE sr.exam_id = e.id
+			        ORDER BY sr.percentage DESC
+			        LIMIT 1
+			    ),
 
-			(
-			SELECT MAX(sr2.percentage)
-			FROM student_results sr2
-			WHERE sr2.exam_id = e.id
-			),
+			    (
+			        SELECT MAX(sr2.percentage)
+			        FROM student_results sr2
+			        WHERE sr2.exam_id = e.id
+			    ),
 
-			e.result_publish_date,
-			true
+			    e.result_publish_date
 
 			FROM exams e
 
 			LEFT JOIN student_results r
-			ON r.exam_id=e.id
+			    ON r.exam_id = e.id
 
-			WHERE e.school_id=:schoolId
+			WHERE e.school_id = :schoolId
+			  AND e.academic_year = :academicYear
+			  AND e.result_publish_date = (
+
+			        SELECT MAX(result_publish_date)
+			        FROM exams
+			        WHERE school_id = :schoolId
+			          AND academic_year = :academicYear
+
+			  )
 
 			GROUP BY
-			e.id,
-			e.exam_name,
-			e.class_name,
-			e.result_publish_date
+			    e.id,
+			    e.exam_type,
+			    e.class_name,
+			    e.result_publish_date
 
-			ORDER BY e.result_publish_date DESC
-			LIMIT 5
-			""", nativeQuery = true)
-	List<Object[]> getRecentResults(@Param("schoolId") Long schoolId);
+			ORDER BY e.class_name
+					""", nativeQuery = true)
+	List<Object[]> getRecentResults(@Param("schoolId") Long schoolId, @Param("academicYear") String academicYear);
 
 	@Query(value = """
 			SELECT *

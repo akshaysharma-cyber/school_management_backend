@@ -13,8 +13,44 @@ public class ReportCardDTO {
     private Double total;
     private Double percentage;
     private Double obtained;
+    private String schoolName;
+    private String district;
+    private String state;
+    private String academicYear;
 
-    public Double getObtained() {
+    public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getAcademicYear() {
+		return academicYear;
+	}
+
+	public void setAcademicYear(String academicYear) {
+		this.academicYear = academicYear;
+	}
+
+	public String getSchoolName() {
+		return schoolName;
+	}
+
+	public void setSchoolName(String schoolName) {
+		this.schoolName = schoolName;
+	}
+
+	public Double getObtained() {
 		return obtained;
 	}
 

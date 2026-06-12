@@ -2,6 +2,7 @@ package com.school.management.School.service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.school.management.School.dto.ExamDashboardDTO;
 import com.school.management.School.dto.RecentResultDTO;
+import com.school.management.School.dto.ResultResponse;
+import com.school.management.School.dto.StudentResultDto;
+import com.school.management.School.entity.Exam;
 import com.school.management.School.repository.ExamRepository;
 import com.school.management.School.repository.StudentRepository;
 import com.school.management.School.repository.StudentResultRepository;
@@ -24,6 +28,11 @@ public class ExamDashboardService {
 
 	@Autowired
 	private StudentResultRepository resultRepository;
+	
+	@Autowired
+	private ResultService resultService;
+	
+
 
 	public ExamDashboardDTO getDashboard(Long schoolId) {
 
@@ -44,37 +53,65 @@ public class ExamDashboardService {
 		return new ExamDashboardDTO(upcoming, ongoing, students, avg == null ? 0 : avg);
 	}
 
-	public List<RecentResultDTO> getRecentResults(Long schoolId) {
+	public List<RecentResultDTO> getRecentResults(
+	        Long schoolId,
+	        String academicYear) {
 
-		List<Object[]> rows = resultRepository.getRecentResults(schoolId);
+	    List<Exam> latestExams =
+	            examRepository.findLatestPublishedExams(
+	                    schoolId,
+	                    academicYear);
 
-		return rows.stream().map(r -> new RecentResultDTO(
+	    List<RecentResultDTO> results = new ArrayList<>();
 
-				// examName
-				r[0] != null ? r[0].toString() : "",
+	    for (Exam exam : latestExams) {
 
-				// className
-				r[1] != null ? r[1].toString() : "",
+	        ResultResponse response = resultService.getResult(
+	                schoolId,
+	                academicYear,
+	                exam.getExamType(),
+	                exam.getClassName());
 
-				// students
-				r[2] != null ? ((Number) r[2]).longValue() : 0L,
+	        StudentResultDto topper =
+	                response.getStudents()
+	                        .stream()
+	                        .max(Comparator.comparing(
+	                                StudentResultDto::getPercentage))
+	                        .orElse(null);
 
-				// average
-				r[3] != null ? ((Number) r[3]).doubleValue() : 0.0,
+	        RecentResultDTO dto = new RecentResultDTO();
 
-				// topperName
-				r[4] != null ? r[4].toString() : "-",
+	        dto.setExamType(exam.getExamType());
 
-				// topperPercentage
-				r[5] != null ? ((Number) r[5]).doubleValue() : 0.0,
+	        dto.setClassName(exam.getClassName());
 
-				// publishedOn
-				r[6] != null ? r[6].toString() : "",
+	        dto.setStudents(
+	                (long) response.getStudents().size());
 
-				// smsSent
-				r[7] != null && Boolean.parseBoolean(r[7].toString())
+	        dto.setAverage(
+	                response.getSummary().getAverage());
 
-		)).toList();
+	        dto.setTopperName(
+	                topper != null
+	                        ? topper.getName()
+	                        : "-");
+
+	        dto.setTopperPercentage(
+	                topper != null
+	                        ? topper.getPercentage()
+	                        : 0.0);
+
+	        dto.setPublishedOn(
+	                exam.getResultPublishDate() != null
+	                        ? exam.getResultPublishDate().toString()
+	                        : "");
+
+	        results.add(dto);
+	    }
+
+	    return results;
 	}
+
+	
 
 }

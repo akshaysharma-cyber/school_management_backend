@@ -76,7 +76,7 @@ public class AuthService {
 		return "User registered successfully";
 	}
 
-	private String generateSchoolCode(String schoolName, String city,String state) {
+	private String generateSchoolCode(String schoolName, String city, String state) {
 
 		String school = schoolName.replaceAll("[^A-Za-z ]", "").toUpperCase();
 
@@ -99,7 +99,7 @@ public class AuthService {
 
 		int random = 100 + new Random().nextInt(900);
 
-		return initials + cityPart +stateCode+ random;
+		return initials + cityPart + stateCode + random;
 	}
 
 	public LoginResponse login(LoginRequest request) {
@@ -136,7 +136,7 @@ public class AuthService {
 
 				token,
 
-				refreshToken);
+				refreshToken, user.getSchool() != null ? user.getSchool().getSchoolName() : null);
 
 	}
 

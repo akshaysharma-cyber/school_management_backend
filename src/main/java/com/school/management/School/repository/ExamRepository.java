@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.school.management.School.entity.Exam;
 
@@ -61,5 +62,22 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
 	        Long schoolId,
 	        String academicYear
 	);
+	
+	@Query("""
+		    SELECT e
+		    FROM Exam e
+		    WHERE e.schoolId = :schoolId
+		      AND e.academicYear = :academicYear
+		      AND e.resultPublishDate = (
+		            SELECT MAX(e2.resultPublishDate)
+		            FROM Exam e2
+		            WHERE e2.schoolId = :schoolId
+		              AND e2.academicYear = :academicYear
+		      )
+		    ORDER BY e.className
+		""")
+		List<Exam> findLatestPublishedExams(
+		        @Param("schoolId") Long schoolId,
+		        @Param("academicYear") String academicYear);
 
 }

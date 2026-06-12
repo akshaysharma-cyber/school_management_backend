@@ -64,12 +64,16 @@ public class ExamController {
         );
     }
     
-	@GetMapping("/recent-results")
-	public ResponseEntity<?> recentResults(@RequestParam Long schoolId) {
+    @GetMapping("/recent-results")
+    public ResponseEntity<?> recentResults(
+            @RequestParam Long schoolId,
+            @RequestParam String academicYear) {
 
-		return ResponseEntity.ok(dashboardService.getRecentResults(schoolId));
-
-	}
+        return ResponseEntity.ok(
+                dashboardService.getRecentResults(
+                        schoolId,
+                        academicYear));
+    }
 	
 	@GetMapping("/types")
 	public ResponseEntity<?> getExamTypes(

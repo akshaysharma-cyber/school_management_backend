@@ -56,8 +56,17 @@ public class LoginResponse {
     private Long schoolId;
     private String token;
     private String refreshToken;
+    private String schoolName;
 
-    public String getRefreshToken() {
+    public String getSchoolName() {
+		return schoolName;
+	}
+
+	public void setSchoolName(String schoolName) {
+		this.schoolName = schoolName;
+	}
+
+	public String getRefreshToken() {
 		return refreshToken;
 	}
 
@@ -65,7 +74,7 @@ public class LoginResponse {
 		this.refreshToken = refreshToken;
 	}
 
-	public LoginResponse(String message, String fullName, String role,Long userId,Long schoolId,String token,String refreshToken) {
+	public LoginResponse(String message, String fullName, String role,Long userId,Long schoolId,String token,String refreshToken,String schoolName) {
         this.message = message;
         this.fullName = fullName;
         this.role = role;
@@ -73,6 +82,7 @@ public class LoginResponse {
         this.schoolId = schoolId;
         this.token=token;
         this.refreshToken=refreshToken;
+        this.schoolName= schoolName;
     }
 
 	public String getToken() {

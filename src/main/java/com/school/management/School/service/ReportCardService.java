@@ -11,8 +11,11 @@ import org.springframework.stereotype.Service;
 import com.school.management.School.dto.ExamWiseMarksDTO;
 import com.school.management.School.dto.ReportCardDTO;
 import com.school.management.School.dto.SubjectResultDTO;
+import com.school.management.School.entity.School;
 import com.school.management.School.entity.Student;
 import com.school.management.School.entity.StudentResult;
+import com.school.management.School.repository.SchoolRepository;
+import com.school.management.School.repository.SchoolRepository;
 import com.school.management.School.repository.StudentRepository;
 import com.school.management.School.repository.StudentResultRepository;
 
@@ -23,6 +26,9 @@ public class ReportCardService {
 
 	@Autowired
 	private StudentResultRepository resultRepo;
+	
+	@Autowired
+	private SchoolRepository schoolRepository;
 
 	 public ReportCardDTO getReportCard(
 	            Long schoolId,
@@ -132,6 +138,11 @@ public class ReportCardService {
 	                        ? (grandObtained * 100.0)
 	                        / grandTotal
 	                        : 0;
+	                
+	                School school =
+	                	    schoolRepository.findById(schoolId)
+	                	        .orElseThrow(() ->
+	                	            new RuntimeException("School not found"));
 
 	        ReportCardDTO report =
 	                new ReportCardDTO();
@@ -139,6 +150,13 @@ public class ReportCardService {
 	        report.setStudentName(
 	                student.getFullName()
 	        );
+	        
+	        report.setSchoolName(
+	        	    school.getSchoolName()
+	        	);
+	        report.setDistrict(school.getCity()); // or district column if you have one
+	        report.setState(school.getState());
+	        report.setAcademicYear(academicYear);
 
 	        report.setClassName(
 	                student.getClassName()

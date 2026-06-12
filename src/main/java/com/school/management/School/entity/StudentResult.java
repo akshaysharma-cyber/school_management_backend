@@ -50,13 +50,7 @@ public class StudentResult {
 		this.className = className;
 	}
 
-	public String getSection() {
-		return section;
-	}
-
-	public void setSection(String section) {
-		this.section = section;
-	}
+	
 
 	public Double getTotalMarks() {
 		return totalMarks;
@@ -114,8 +108,6 @@ public class StudentResult {
     @Column(name = "class_name")
     private String className;
 
-    @Column(name = "section")
-    private String section;
 
     @Column(name = "total_marks")
     private Double totalMarks;

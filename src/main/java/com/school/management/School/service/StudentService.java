@@ -183,6 +183,7 @@ public class StudentService {
 			student.setAddress(updatedStudent.getAddress());
 
 			student.setClassName(updatedStudent.getClassName());
+			
 
 			student.setActive(false);
 			return studentRepository.save(student);
