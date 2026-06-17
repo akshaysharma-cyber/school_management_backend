@@ -47,7 +47,7 @@ public class MarksService {
 		}
 
 		// ✅ 2. Validate subject
-		if (!examSubjectRepository.existsByExamIdAndSubjectId(request.getExamId(), request.getSubjectId())) {
+		if (!examSubjectRepository.existsBySchoolIdAndExamIdAndSubjectId( request.getSchoolId(), request.getExamId(), request.getSubjectId())) {
 
 			throw new RuntimeException("Subject not part of exam");
 		}
@@ -87,7 +87,7 @@ public class MarksService {
 			throw new RuntimeException("Invalid class for exam");
 		}
 
-		List<ExamSubject> examSubjects = examSubjectRepository.findByExamId(examId);
+		List<ExamSubject> examSubjects = examSubjectRepository.findBySchoolIdAndExamId(schoolId,examId);
 
 		List<ExamSubjectDto> response = new ArrayList<>();
 

@@ -7,9 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.school.management.School.entity.ExamSubject;
 
 public interface ExamSubjectRepository extends JpaRepository<ExamSubject, Long>{
-	boolean existsByExamIdAndSubjectId(Long examId, Long subjectId);
+	boolean existsBySchoolIdAndExamIdAndSubjectId(
+		    Long schoolId,
+		    Long examId,
+		    Long subjectId
+		);
 	
-	List<ExamSubject> findByExamId(Long examId);
+	List<ExamSubject> findBySchoolIdAndExamId(
+		    Long schoolId,
+		    Long examId
+		);
 
     
 }

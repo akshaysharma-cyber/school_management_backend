@@ -46,7 +46,7 @@ public class ResultService {
 
 		List<Student> students = studentRepository.findBySchoolIdAndClassName(schoolId, className);
 
-		List<ExamSubject> examSubjects = examSubjectRepository.findByExamId(examId);
+		List<ExamSubject> examSubjects = examSubjectRepository.findBySchoolIdAndExamId(schoolId,examId);
 
 		// 🔹 Subjects List
 		List<SubjectDto> subjectList = new ArrayList<>();
