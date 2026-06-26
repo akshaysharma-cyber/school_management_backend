@@ -93,7 +93,9 @@ public class TeacherService {
 		teacher.setEmployeeId(request.getEmployeeId());
 		teacher.setQualification(request.getQualification());
 		teacher.setSubject(request.getSubject());
-
+		teacher.setFullName(request.getFullName());
+		teacher.setMobileNumber(request.getMobile());
+		teacher.setEmail(request.getEmail());
 		// Date parsing
 		if (request.getJoiningDate() != null && !request.getJoiningDate().isEmpty()) {
 			teacher.setJoiningDate(LocalDate.parse(request.getJoiningDate()));
@@ -131,8 +133,10 @@ public class TeacherService {
 			}
 
 			dto.setEmployeeId(t.getEmployeeId());
-
 			dto.setSubject(t.getSubject());
+			dto.setQualification(t.getQualification());
+			dto.setGender(t.getGender());
+			dto.setEmail(t.getEmail());
 
 			return dto;
 
@@ -158,7 +162,6 @@ public class TeacherService {
 			teacher.setDateOfBirth(updatedTeacher.getDateOfBirth());
 			teacher.setGender(updatedTeacher.getGender());
 			teacher.setAddress(updatedTeacher.getAddress());
-
 			teacher.setEmployeeId(updatedTeacher.getEmployeeId());
 			teacher.setQualification(updatedTeacher.getQualification());
 			teacher.setSubject(updatedTeacher.getSubject());
