@@ -165,26 +165,22 @@ public class StudentService {
 
 			Student student = optionalStudent.get();
 
-			// student.setAdmissionNumber(updatedStudent.getAdmissionNumber());
+		    //student.setAdmissionNumber(updatedStudent.getAdmissionNumber());
 			student.setFullName(updatedStudent.getFullName());
 			student.setDateOfBirth(updatedStudent.getDateOfBirth());
 			student.setGender(updatedStudent.getGender());
 			student.setBloodGroup(updatedStudent.getBloodGroup());
-
 			student.setCategory(updatedStudent.getCategory());
 			student.setReligion(updatedStudent.getReligion());
 			student.setNationality(updatedStudent.getNationality());
-
 			student.setParentName(updatedStudent.getParentName());
 			student.setRelationship(updatedStudent.getRelationship());
 			student.setParentMobile(updatedStudent.getParentMobile());
 			student.setParentEmail(updatedStudent.getParentEmail());
-
 			student.setAddress(updatedStudent.getAddress());
-
 			student.setClassName(updatedStudent.getClassName());
-			
-
+			student.setAcademicYear(updatedStudent.getAcademicYear());
+			student.setBirthCertificateUrl(updatedStudent.getBirthCertificateUrl());
 			student.setActive(false);
 			return studentRepository.save(student);
 		}

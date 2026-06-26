@@ -11,6 +11,34 @@ public class TeacherResponse {
     private String employeeId;
 
     private String subject;
+    
+    private String email;
+     private String qualification;
+     private String gender;
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getQualification() {
+		return qualification;
+	}
+
+	public void setQualification(String qualification) {
+		this.qualification = qualification;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
 
 	public Long getId() {
 		return id;

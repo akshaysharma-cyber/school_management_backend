@@ -120,8 +120,17 @@ public class TeacherDetails {
     private String employeeId;
     private String qualification;
     private String subject;
+    private String email;
 
-    private LocalDate joiningDate;
+    public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	private LocalDate joiningDate;
     private LocalDate dateOfBirth;
 
     private String gender;
