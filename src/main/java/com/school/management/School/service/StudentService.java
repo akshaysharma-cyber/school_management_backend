@@ -191,15 +191,15 @@ public class StudentService {
 	// =========================
 	// DELETE STUDENT
 	// =========================
-	public String deleteStudent(Long id) {
+	public String deleteStudent(Long id, Long schoolId) {
 
-		if (studentRepository.existsById(id)) {
+	    Student student = studentRepository
+	            .findBySchoolIdAndId(schoolId, id)
+	            .orElseThrow(() ->
+	                    new RuntimeException("Student not found for this school"));
 
-			studentRepository.deleteById(id);
+	    studentRepository.delete(student);
 
-			return "Student Deleted Successfully";
-		}
-
-		return "Student Not Found";
+	    return "Student Deleted Successfully";
 	}
 }

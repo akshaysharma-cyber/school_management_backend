@@ -17,4 +17,6 @@ public interface TeacherRepository extends JpaRepository<TeacherDetails, Long> {
 	    List<TeacherDetails> findBySchoolId(Long schoolId);
 	    
 	    long countBySchoolId(Long schoolId);
+	    
+	    Optional<TeacherDetails> findByIdAndSchoolId(Long id, Long schoolId);
 }

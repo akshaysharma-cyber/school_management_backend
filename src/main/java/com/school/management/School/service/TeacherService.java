@@ -174,11 +174,16 @@ public class TeacherService {
 	}
 
 	// DELETE TEACHER
-	public String deleteTeacher(Long id) {
+	public String deleteTeacher(Long id, Long schoolId) {
 
-		teacherRepository.deleteById(id);
+	    TeacherDetails teacher = teacherRepository
+	            .findByIdAndSchoolId(id, schoolId)
+	            .orElseThrow(() ->
+	                    new RuntimeException("Teacher not found for this school"));
 
-		return "Teacher Deleted Successfully";
+	    teacherRepository.delete(teacher);
+
+	    return "Teacher Deleted Successfully";
 	}
 
 }

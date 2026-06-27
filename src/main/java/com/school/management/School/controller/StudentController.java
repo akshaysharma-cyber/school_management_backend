@@ -114,9 +114,11 @@ public class StudentController {
 	// DELETE STUDENT
 	// ==================================
 	@DeleteMapping("/delete/{id}")
-	public String deleteStudent(@PathVariable Long id) {
+	public ResponseEntity<String> deleteStudent(
+	        @PathVariable Long id,
+	        @RequestParam Long schoolId) {
 
-		return studentService.deleteStudent(id);
+	    return ResponseEntity.ok(studentService.deleteStudent(id, schoolId));
 	}
 
 }
