@@ -18,7 +18,9 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
 
                 registry.addMapping("/**")
-                        .allowedOrigins("http://34.201.146.20")
+                        .allowedOrigins("http://34.201.146.20","http://localhost:5173","https://www.alpineschool.co.in",
+                        	    "https://alpineschool.co.in")
+                     
                         .allowedMethods("*");
             }
         };
