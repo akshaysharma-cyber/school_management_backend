@@ -1,5 +1,7 @@
 package com.school.management.School.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,6 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.school.management.School.utility.JwtFilter;
 
@@ -41,9 +46,7 @@ public class SecurityConfig {
         http
 
             // ENABLE CORS
-            .cors(
-                cors -> {}
-            )
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             // DISABLE CSRF
             .csrf(
@@ -74,7 +77,7 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/api/auth/**",
                         "/api/fees/receipt/**",
-                        "/api/subjects-by-class",
+                        "/api/subjects-by-class/**",
                         "/api/exams/**",
                         "/api/marks/**",
                         "/api/report-card/**"
@@ -92,5 +95,25 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+    
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of(
+            "http://localhost:5173",
+            "https://alpineschool.co.in",
+            "https://www.alpineschool.co.in"
+        ));
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 }
