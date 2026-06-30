@@ -39,60 +39,39 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain security(
-            HttpSecurity http
-    ) throws Exception {
+    public SecurityFilterChain security(HttpSecurity http) throws Exception {
 
         http
+            // ✅ DISABLE CSRF COMPLETELY (VERY IMPORTANT FOR APIs)
+            .csrf(csrf -> csrf.disable())
 
-            // ENABLE CORS
+            // ✅ MAKE SESSION STATELESS (JWT REQUIRED FIX)
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                    org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+                )
+            )
+
+            // ✅ CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // DISABLE CSRF
-            .csrf(
-                csrf -> csrf.disable()
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
+
+            .authorizeHttpRequests(auth -> auth
+
+                // 🔥 ALLOW LOGIN + AUTH APIs WITHOUT TOKEN
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // OPTIONS preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // everything else secured
+                .anyRequest().authenticated()
             )
 
-            // DISABLE LOGIN PAGE
-            .formLogin(
-                login -> login.disable()
-            )
-
-            // DISABLE BASIC AUTH
-            .httpBasic(
-                basic -> basic.disable()
-            )
-
-            .authorizeHttpRequests(
-                auth -> auth
-
-                    // Allow browser preflight
-                    .requestMatchers(
-                        HttpMethod.OPTIONS,
-                        "/**"
-                    )
-                    .permitAll()
-
-                    // Public APIs
-                    .requestMatchers(
-                        "/api/auth/**",
-                        "/api/fees/receipt/**",
-                        "/api/subjects-by-class/**",
-                        "/api/exams/**",
-                        "/api/marks/**",
-                        "/api/report-card/**"
-                    )
-                    .permitAll()
-
-                    // Secure APIs
-                    .anyRequest()
-                    .authenticated()
-            )
-
-            .addFilterBefore(
-                jwtFilter,
-                UsernamePasswordAuthenticationFilter.class
-            );
+            // JWT FILTER
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
