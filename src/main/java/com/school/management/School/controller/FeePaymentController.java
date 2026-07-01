@@ -3,6 +3,7 @@ package com.school.management.School.controller;
 import java.io.ByteArrayInputStream;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,18 @@ public class FeePaymentController {
 	public ResponseEntity<?> collectFee(
 	        @RequestBody CollectFeeRequest request) {
 
-	    return ResponseEntity.ok(
-	            feePaymentService.collectFee(request));
+		try {
+	        String receipt = feePaymentService.collectFee(request);
+	        return ResponseEntity.ok(receipt);
+
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.badRequest().body(
+	            Map.of(
+	                
+	                "message", e.getMessage()
+	            )
+	        );
+	    }
 	}
     
     @GetMapping("/student/{id}")

@@ -53,7 +53,7 @@ public class SecurityConfig {
             )
 
             // ✅ CORS
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(cors -> {})
 
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
@@ -76,23 +76,5 @@ public class SecurityConfig {
         return http.build();
     }
     
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "https://alpineschool.co.in",
-            "https://www.alpineschool.co.in"
-        ));
-
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return source;
-    }
+    
 }
