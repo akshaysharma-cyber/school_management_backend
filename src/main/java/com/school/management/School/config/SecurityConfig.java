@@ -62,6 +62,8 @@ public class SecurityConfig {
 
                 // 🔥 ALLOW LOGIN + AUTH APIs WITHOUT TOKEN
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers("/api/students/**").permitAll()
 
                 // OPTIONS preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
